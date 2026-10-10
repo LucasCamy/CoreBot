@@ -138,6 +138,41 @@ export class VoiceHubService {
         permissionOverwrites,
       });
 
+      // Compensatory Transaction (Saga pattern): Persist in database with automatic rollback
+      try {
+        await this.container.voiceHubRepository.createActiveChannel(
+          guildId,
+          newChannel.id,
+          member.id,
+          isPrivate,
+          [],
+        );
+      } catch (dbError) {
+        logger.error(
+          {
+            error: dbError instanceof Error ? dbError.message : String(dbError),
+            guildId,
+            channelId: newChannel.id,
+            memberId: member.id,
+          },
+          'Database persistence failed for active voice channel. Executing compensating rollback (deleting orphan channel)...',
+        );
+
+        await newChannel
+          .delete('VoiceHub Compensating Rollback: database failed to persist active channel')
+          .catch((delErr) => {
+            logger.error(
+              {
+                delError: delErr instanceof Error ? delErr.message : String(delErr),
+                channelId: newChannel.id,
+              },
+              'Compensating rollback failed: could not delete orphan Discord voice channel',
+            );
+          });
+
+        throw dbError;
+      }
+
       // Move member into new channel
       await member.voice.setChannel(newChannel.id).catch((err) => {
         logger.warn(
@@ -145,15 +180,6 @@ export class VoiceHubService {
           'Failed to move member into dynamic voice channel',
         );
       });
-
-      // Persist in ActiveVoiceChannel
-      await this.container.voiceHubRepository.createActiveChannel(
-        guildId,
-        newChannel.id,
-        member.id,
-        isPrivate,
-        [],
-      );
 
       // Send Control Panel ActionRows in the voice channel's text chat
       await this.sendControlPanel(newChannel, member, isPrivate);

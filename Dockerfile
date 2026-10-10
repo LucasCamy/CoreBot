@@ -5,7 +5,7 @@
 # Stage 1: Build & Dependencies
 FROM node:20-alpine AS builder
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Install build dependencies, native compilation tools and ffmpeg
 RUN apk add --no-cache openssl ffmpeg make python3 g++
@@ -32,7 +32,7 @@ RUN npm prune --omit=dev
 # Stage 2: Production Runtime
 FROM node:20-alpine AS runner
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Add openssl and curl for Prisma runtime/healthcheck, ffmpeg for voice playback, and postgresql16-client for pg_dump backups
 RUN apk add --no-cache openssl curl ffmpeg postgresql16-client
@@ -40,13 +40,21 @@ RUN apk add --no-cache openssl curl ffmpeg postgresql16-client
 # Create non-root system group and user
 RUN addgroup -S corebot && adduser -S corebot -G corebot
 
+# Pre-create sound assets and backup directories with proper ownership for non-root corebot user
+RUN mkdir -p /app/assets/sounds /app/backups && \
+    chown -R corebot:corebot /app
+
 # Copy built application and pruned production node_modules
-COPY --from=builder --chown=corebot:corebot /usr/src/app/package*.json ./
-COPY --from=builder --chown=corebot:corebot /usr/src/app/node_modules ./node_modules
-COPY --from=builder --chown=corebot:corebot /usr/src/app/dist ./dist
-COPY --from=builder --chown=corebot:corebot /usr/src/app/prisma ./prisma
+COPY --from=builder --chown=corebot:corebot /app/package*.json ./
+COPY --from=builder --chown=corebot:corebot /app/node_modules ./node_modules
+COPY --from=builder --chown=corebot:corebot /app/dist ./dist
+COPY --from=builder --chown=corebot:corebot /app/prisma ./prisma
 COPY --chown=corebot:corebot assets ./assets
 COPY --chown=corebot:corebot docker-entrypoint.sh ./docker-entrypoint.sh
+
+# Ensure non-root ownership on copied assets and runtime directories
+RUN chown -R corebot:corebot /app/assets/sounds /app/backups && \
+    chmod -R 755 /app/assets/sounds /app/backups
 
 # Make entrypoint executable
 RUN chmod +x ./docker-entrypoint.sh

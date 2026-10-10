@@ -59,6 +59,12 @@ describe('SoundboardService validations', () => {
     expect(res.message).toContain('não foi encontrado');
   });
 
+  it('should validate isSafePath correctly to prevent Path Traversal', () => {
+    expect(SoundboardService.isSafePath('assets/sounds/horn.mp3')).toBe(true);
+    expect(SoundboardService.isSafePath('../../etc/passwd')).toBe(false);
+    expect(SoundboardService.isSafePath('assets/sounds/../secrets.env')).toBe(false);
+  });
+
   it('should safely stopAll without errors', () => {
     expect(() => SoundboardService.stopAll()).not.toThrow();
   });
@@ -76,5 +82,25 @@ describe('TwitchService tests', () => {
     // In test environment, if TWITCH_CLIENT_ID is not set, it should return null safely
     const token = await service.getAppAccessToken();
     expect(typeof token === 'string' || token === null).toBe(true);
+  });
+});
+
+describe('isDiscordChannelError utility', () => {
+  it('should recognize 10003 Unknown Channel and 50013 Missing Access', async () => {
+    const { isDiscordChannelError } = await import('../../src/utils/discord-error.js');
+
+    const err10003 = { code: 10003, message: 'Unknown Channel' };
+    const res1 = isDiscordChannelError(err10003);
+    expect(res1.isChannelError).toBe(true);
+    expect(res1.isUnknownChannel).toBe(true);
+
+    const err50013 = { code: 50013, message: 'Missing Permissions' };
+    const res2 = isDiscordChannelError(err50013);
+    expect(res2.isChannelError).toBe(true);
+    expect(res2.isMissingAccess).toBe(true);
+
+    const genericErr = new Error('Generic network timeout');
+    const res3 = isDiscordChannelError(genericErr);
+    expect(res3.isChannelError).toBe(false);
   });
 });

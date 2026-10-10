@@ -19,8 +19,8 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - sound_assets:/usr/src/app/assets/sounds
-      - backup_data:/usr/src/app/backups
+      - assets_sounds:/app/assets/sounds
+      - backup_data:/app/backups
     networks:
       - corebot-network
 
@@ -67,7 +67,7 @@ volumes:
     driver: local
   redis_data:
     driver: local
-  sound_assets:
+  assets_sounds:
     driver: local
   backup_data:
     driver: local

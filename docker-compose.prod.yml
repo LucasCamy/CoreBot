@@ -19,6 +19,9 @@ services:
         condition: service_healthy
     ports:
       - "127.0.0.1:3000:3000"
+    volumes:
+      - assets_sounds_prod:/app/assets/sounds
+      - backup_data_prod:/app/backups
     logging:
       driver: "json-file"
       options:
@@ -74,6 +77,10 @@ volumes:
   postgres_prod_data:
     driver: local
   redis_prod_data:
+    driver: local
+  assets_sounds_prod:
+    driver: local
+  backup_data_prod:
     driver: local
 
 networks:

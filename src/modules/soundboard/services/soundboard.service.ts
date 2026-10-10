@@ -53,7 +53,7 @@ const soundUploadSchema = z.object({
 });
 
 export class SoundboardService {
-  private static readonly SOUNDS_DIR = path.join(process.cwd(), 'assets', 'sounds');
+  private static readonly SOUNDS_DIR = path.resolve(process.cwd(), 'assets', 'sounds');
   private static activeChannels = new Set<string>();
   private static activeCleanups = new Map<string, () => void>();
 
@@ -62,10 +62,25 @@ export class SoundboardService {
       process.env.FFMPEG_PATH = ffmpegPath;
     }
 
-    // Ensure assets directory exists
+    this.ensureSoundsDirectory();
+  }
+
+  private ensureSoundsDirectory(): void {
     if (!fs.existsSync(SoundboardService.SOUNDS_DIR)) {
       fs.mkdirSync(SoundboardService.SOUNDS_DIR, { recursive: true });
     }
+  }
+
+  /**
+   * Validates that the target file path resides strictly inside SOUNDS_DIR to prevent Path Traversal.
+   */
+  public static isSafePath(targetPath: string): boolean {
+    const resolvedTarget = path.resolve(targetPath);
+    const resolvedSoundsDir = path.resolve(SoundboardService.SOUNDS_DIR);
+    return (
+      resolvedTarget.startsWith(resolvedSoundsDir + path.sep) ||
+      resolvedTarget === resolvedSoundsDir
+    );
   }
 
   /**
@@ -88,7 +103,7 @@ export class SoundboardService {
   }
 
   public getAvailableSounds(): SoundItem[] {
-    if (!fs.existsSync(SoundboardService.SOUNDS_DIR)) return [];
+    this.ensureSoundsDirectory();
 
     const files = fs.readdirSync(SoundboardService.SOUNDS_DIR);
     const validExts = ['.mp3', '.ogg', '.wav', '.m4a'];
@@ -99,7 +114,9 @@ export class SoundboardService {
       const ext = path.extname(file).toLowerCase();
       if (!validExts.includes(ext)) continue;
 
-      const fullPath = path.join(SoundboardService.SOUNDS_DIR, file);
+      const fullPath = path.resolve(SoundboardService.SOUNDS_DIR, file);
+      if (!SoundboardService.isSafePath(fullPath)) continue;
+
       const stats = fs.statSync(fullPath);
       const name = path.basename(file, ext).toLowerCase();
 
@@ -174,7 +191,20 @@ export class SoundboardService {
 
     const sanitizedName = parsed.data.name;
     const targetFilename = `${sanitizedName}${ext}`;
-    const targetPath = path.join(SoundboardService.SOUNDS_DIR, targetFilename);
+    const targetPath = path.resolve(SoundboardService.SOUNDS_DIR, targetFilename);
+
+    if (!SoundboardService.isSafePath(targetPath)) {
+      logger.warn(
+        { targetPath, name: sanitizedName },
+        'Blocked potential path traversal attempt during sound upload',
+      );
+      return {
+        success: false,
+        message: '❌ Nome de arquivo inválido: tentativa de Path Traversal bloqueada.',
+      };
+    }
+
+    this.ensureSoundsDirectory();
 
     try {
       const response = await fetch(attachmentUrl);
@@ -240,7 +270,7 @@ export class SoundboardService {
   }
 
   /**
-   * Deletes an existing sound file.
+   * Deletes an existing sound file safely.
    */
   public deleteSound(name: string): { success: boolean; message: string } {
     const sanitizedName = name.trim().toLowerCase();
@@ -254,9 +284,21 @@ export class SoundboardService {
       };
     }
 
+    const targetPath = path.resolve(SoundboardService.SOUNDS_DIR, soundItem.filename);
+    if (!SoundboardService.isSafePath(targetPath)) {
+      logger.warn(
+        { targetPath, name: sanitizedName },
+        'Blocked potential path traversal attempt during sound deletion',
+      );
+      return {
+        success: false,
+        message: '❌ Caminho de arquivo inválido: deleção bloqueada.',
+      };
+    }
+
     try {
-      if (fs.existsSync(soundItem.path)) {
-        fs.unlinkSync(soundItem.path);
+      if (fs.existsSync(targetPath)) {
+        fs.unlinkSync(targetPath);
         logger.info({ soundName: sanitizedName }, 'Sound deleted from soundboard');
         return {
           success: true,

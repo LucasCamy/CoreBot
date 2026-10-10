@@ -10,6 +10,7 @@ import {
 } from 'discord.js';
 import { NotificationLogRepository } from '../database/repositories/notification-log.repository.js';
 import { logger } from '../utils/logger.js';
+import { isDiscordChannelError } from '../utils/discord-error.js';
 
 export interface SendChannelNotificationDto {
   guildId: string;
@@ -120,8 +121,38 @@ export class NotificationService {
       return null;
     }
 
+    if (typeof this.client.isReady === 'function' && !this.client.isReady()) {
+      logger.warn(
+        { guildId, channelId, module, eventType },
+        'Discord gateway client is not ready. Postponing notification delivery...',
+      );
+      throw new Error('Discord gateway is not ready (client disconnected/reconnecting).');
+    }
+
     try {
-      const channel = await this.client.channels.fetch(channelId).catch(() => null);
+      let channel = null;
+      try {
+        channel = await this.client.channels.fetch(channelId);
+      } catch (fetchErr) {
+        const channelErr = isDiscordChannelError(fetchErr);
+        if (channelErr.isChannelError) {
+          const errorMsg = `Channel ${channelId} missing or inaccessible (DiscordAPIError code: ${channelErr.code})`;
+          logger.warn(
+            { channelId, guildId, module, eventType, errorCode: channelErr.code },
+            errorMsg,
+          );
+          await this.logRepository.create({
+            guildId,
+            module,
+            eventType,
+            targetChannelId: channelId,
+            success: false,
+            error: errorMsg,
+          });
+          return null;
+        }
+        throw fetchErr;
+      }
 
       if (!channel || !channel.isTextBased()) {
         const errorMsg = `Channel ${channelId} not found or is not a text channel`;

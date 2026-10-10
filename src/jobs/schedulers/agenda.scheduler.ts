@@ -4,6 +4,7 @@ import { QueueManager } from '../queue.js';
 import { logger } from '../../utils/logger.js';
 import { BotEmbed } from '../../utils/embed.builder.js';
 import { formatInTimezone } from '../../utils/time.js';
+import { isDiscordChannelError } from '../../utils/discord-error.js';
 
 export class AgendaScheduler {
   private timer: NodeJS.Timeout | null = null;
@@ -17,6 +18,14 @@ export class AgendaScheduler {
     QueueManager.registerWorker(
       QUEUE_NAMES.AGENDA_REMINDERS,
       async (job) => {
+        if (!this.container.client.isReady()) {
+          logger.warn(
+            { jobId: job.id },
+            'Discord client is not ready (gateway disconnected). Rescheduling agenda reminder...',
+          );
+          throw new Error('Discord client gateway is not ready. Worker job will be retried.');
+        }
+
         const { eventId, minutesBefore } = job.data as { eventId: string; minutesBefore: number };
         await this.sendReminder(eventId, minutesBefore);
       },
@@ -116,6 +125,31 @@ export class AgendaScheduler {
     if (sent) {
       await agendaRepo.markReminderSent(event.id, minutesBefore);
       logger.info({ eventId: event.id, minutesBefore }, 'Event reminder dispatched and recorded');
+    } else {
+      try {
+        const channel = await this.container.client.channels.fetch(event.reminderChannelId);
+        if (!channel) {
+          logger.warn(
+            { guildId: event.guildId, channelId: event.reminderChannelId, eventId: event.id },
+            'Reminder channel was deleted. Marking reminder as sent to prevent worker retries.',
+          );
+          await agendaRepo.markReminderSent(event.id, minutesBefore);
+        }
+      } catch (chErr) {
+        const parsed = isDiscordChannelError(chErr);
+        if (parsed.isChannelError) {
+          logger.warn(
+            {
+              guildId: event.guildId,
+              channelId: event.reminderChannelId,
+              eventId: event.id,
+              errorCode: parsed.code,
+            },
+            'Reminder channel is missing or inaccessible (DiscordAPIError). Marking reminder as sent to avoid queue stalls.',
+          );
+          await agendaRepo.markReminderSent(event.id, minutesBefore);
+        }
+      }
     }
   }
 }

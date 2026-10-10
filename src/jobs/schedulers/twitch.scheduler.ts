@@ -4,6 +4,7 @@ import { QUEUE_NAMES } from '../../config/constants.js';
 import { QueueManager } from '../queue.js';
 import { logger } from '../../utils/logger.js';
 import { TwitchService } from '../../modules/stream-notifier/services/twitch.service.js';
+import { isDiscordChannelError } from '../../utils/discord-error.js';
 
 export class TwitchScheduler {
   private timer: NodeJS.Timeout | null = null;
@@ -22,6 +23,14 @@ export class TwitchScheduler {
     QueueManager.registerWorker(
       QUEUE_NAMES.TWITCH_POLLING,
       async (job) => {
+        if (!this.container.client.isReady()) {
+          logger.warn(
+            { jobId: job.id },
+            'Discord client is not ready (gateway disconnected). Rescheduling Twitch polling cycle...',
+          );
+          throw new Error('Discord client gateway is not ready. Worker job will be retried.');
+        }
+
         logger.debug({ jobId: job.id }, 'Executing Twitch streams polling cycle');
         await this.pollStreams();
       },
@@ -55,6 +64,12 @@ export class TwitchScheduler {
   }
 
   public async pollStreams(): Promise<void> {
+    if (!this.container.client.isReady()) {
+      throw new Error(
+        'Discord client is not ready (gateway disconnected). Skipping stream polling cycle.',
+      );
+    }
+
     const streamerRepo = this.container.streamerRepository;
     const allConfigs = await streamerRepo.listAll();
 
@@ -102,8 +117,34 @@ export class TwitchScheduler {
                 },
                 'Sent Twitch live announcement',
               );
+            } else {
+              logger.warn(
+                {
+                  guildId: config.guildId,
+                  channelId: config.channelId,
+                  streamer: config.streamerLogin,
+                },
+                'Twitch target channel is not a text-based channel. Deleting invalid streamer config.',
+              );
+              await streamerRepo.delete(config.guildId, config.streamerLogin);
+              continue;
             }
           } catch (notifErr) {
+            const channelErr = isDiscordChannelError(notifErr);
+            if (channelErr.isChannelError) {
+              logger.warn(
+                {
+                  guildId: config.guildId,
+                  channelId: config.channelId,
+                  streamer: config.streamerLogin,
+                  errorCode: channelErr.code,
+                },
+                'Twitch announcement channel missing or inaccessible (DiscordAPIError). Deleting invalid streamer config.',
+              );
+              await streamerRepo.delete(config.guildId, config.streamerLogin);
+              continue;
+            }
+
             logger.error(
               { error: notifErr, streamer: config.streamerLogin, channelId: config.channelId },
               'Failed to send Twitch live notification to channel',

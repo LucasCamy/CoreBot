@@ -5,6 +5,7 @@ import { queryServer, ServerQueryResult } from './query.protocols.js';
 import { BOT_COLORS } from '../../../config/constants.js';
 import { logger } from '../../../utils/logger.js';
 import { QueueManager } from '../../../jobs/queue.js';
+import { isDiscordChannelError } from '../../../utils/discord-error.js';
 
 export const GAME_MONITOR_QUEUE = 'game-server-monitor-queue';
 
@@ -76,6 +77,12 @@ export class GameMonitorService {
     const server = await serverRepo.findById(serverId);
     if (!server || !server.isActive) return;
 
+    if (!this.container.client.isReady()) {
+      throw new Error(
+        'Discord client is not ready (gateway disconnected). Rescheduling server display update...',
+      );
+    }
+
     try {
       const queryResult = await queryServer(
         server.gameType,
@@ -85,15 +92,34 @@ export class GameMonitorService {
       );
 
       const embed = this.buildServerEmbed(server, queryResult);
-      const channel = await this.container.client.channels
-        .fetch(server.displayChannelId)
-        .catch(() => null);
+      let channel = null;
+
+      try {
+        channel = await this.container.client.channels.fetch(server.displayChannelId);
+      } catch (fetchError) {
+        const channelErr = isDiscordChannelError(fetchError);
+        if (channelErr.isChannelError) {
+          logger.warn(
+            {
+              guildId: server.guildId,
+              channelId: server.displayChannelId,
+              serverId: server.id,
+              errorCode: channelErr.code,
+            },
+            'Display channel not found or bot lacks access (DiscordAPIError). Deactivating monitored server.',
+          );
+          await serverRepo.update(server.id, { isActive: false });
+          return;
+        }
+        throw fetchError;
+      }
 
       if (!channel || !channel.isTextBased()) {
         logger.warn(
-          { channelId: server.displayChannelId, serverId: server.id },
-          'Display channel not found for monitored server',
+          { channelId: server.displayChannelId, serverId: server.id, guildId: server.guildId },
+          'Display channel is not a valid text channel. Deactivating monitored server.',
         );
+        await serverRepo.update(server.id, { isActive: false });
         return;
       }
 
@@ -101,7 +127,20 @@ export class GameMonitorService {
       let existingMessage = null;
 
       if (server.messageId) {
-        existingMessage = await textChannel.messages.fetch(server.messageId).catch(() => null);
+        existingMessage = await textChannel.messages.fetch(server.messageId).catch((msgErr) => {
+          const chErr = isDiscordChannelError(msgErr);
+          if (chErr.isChannelError) {
+            logger.warn(
+              {
+                guildId: server.guildId,
+                channelId: server.displayChannelId,
+                errorCode: chErr.code,
+              },
+              'Access denied or unknown channel when fetching server display message.',
+            );
+          }
+          return null;
+        });
       }
 
       if (existingMessage) {
@@ -128,7 +167,22 @@ export class GameMonitorService {
         }
       }
     } catch (error) {
+      const channelErr = isDiscordChannelError(error);
+      if (channelErr.isChannelError) {
+        logger.warn(
+          {
+            guildId: server.guildId,
+            channelId: server.displayChannelId,
+            serverId: server.id,
+            errorCode: channelErr.code,
+          },
+          'Channel deleted or inaccessible during game server update. Marking as inactive.',
+        );
+        await serverRepo.update(server.id, { isActive: false });
+        return;
+      }
       logger.error({ error, serverId: server.id }, 'Failed to update game server display');
+      throw error;
     }
   }
 
@@ -140,6 +194,13 @@ export class GameMonitorService {
       GAME_MONITOR_QUEUE,
       async (job) => {
         const { serverId } = job.data as { serverId: string };
+        if (!this.container.client.isReady()) {
+          logger.warn(
+            { serverId, jobId: job.id },
+            'Discord client is not ready (gateway disconnected). Rescheduling game monitor job...',
+          );
+          throw new Error('Discord client gateway is not ready. Worker job will be retried.');
+        }
         await this.updateServerDisplay(serverId);
       },
       { concurrency: 3 },
