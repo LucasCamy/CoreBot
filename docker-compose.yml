@@ -1,0 +1,77 @@
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: corebot-app
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://corebot:corebot@postgres:5432/corebot?schema=public
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    volumes:
+      - sound_assets:/usr/src/app/assets/sounds
+      - backup_data:/usr/src/app/backups
+    networks:
+      - corebot-network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: corebot-postgres
+    restart: unless-stopped
+    command: ["postgres", "-c", "max_connections=100"]
+    environment:
+      POSTGRES_USER: corebot
+      POSTGRES_PASSWORD: corebot
+      POSTGRES_DB: corebot
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U corebot -d corebot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - corebot-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: corebot-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - corebot-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  sound_assets:
+    driver: local
+  backup_data:
+    driver: local
+
+networks:
+  corebot-network:
+    driver: bridge

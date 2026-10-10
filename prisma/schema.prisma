@@ -1,0 +1,436 @@
+// Prisma schema for CoreBot
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model GuildConfig {
+  guildId        String   @id
+  timezone       String   @default("America/Sao_Paulo")
+  botEnabled     Boolean  @default(true)
+  adminRoleIds   String[] @default([])
+  backupChannelId String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  voiceConfigs        VoiceNotificationConfig[]
+  events              ScheduledEvent[]
+  attendeeLists       AttendeeList[]
+  birthdays           BirthdayConfig[]
+  notificationLogs    NotificationLog[]
+  voiceHubConfigs     VoiceHubConfig[]
+  activeVoiceChannels ActiveVoiceChannel[]
+  monitoredServers    MonitoredServer[]
+  webhookConfig       WebhookConfig?
+  customRoleConfig    CustomRoleConfig?
+  customRoles         UserCustomRole[]
+  quotes              Quote[]
+  gameLobbies         GameLobby[]
+  communityClips      CommunityClip[]
+  tribunalCases       TribunalCase[]
+  voiceActivityLogs   VoiceActivityLog[]
+  countdowns          Countdown[]
+  streamers           StreamerConfig[]
+
+  @@map("guild_configs")
+}
+
+model VoiceNotificationConfig {
+  id              String   @id @default(uuid())
+  guildId         String
+  voiceChannelId  String
+  targetChannelId String
+  enabled         Boolean  @default(true)
+  joinMessage     String   @default("👋 {userMention} entrou no canal {channelMention}!")
+  leaveMessage    String   @default("🚪 {userMention} saiu do canal {channelMention}.")
+  moveMessage     String?  @default("🔀 {userMention} mudou do canal {channelMention} para outro canal.")
+  mentionUser     Boolean  @default(true)
+  useEmbed        Boolean  @default(false)
+  embedColor      String?  @default("#5865F2")
+  cooldownSeconds Int      @default(10)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  guild           GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+
+  @@unique([guildId, voiceChannelId])
+  @@index([guildId])
+  @@map("voice_notification_configs")
+}
+
+model ScheduledEvent {
+  id                    String    @id @default(uuid())
+  guildId               String
+  title                 String
+  description           String?
+  startsAt              DateTime
+  endsAt                DateTime?
+  reminderChannelId     String
+  reminderMinutesBefore Int[]     @default([60, 30, 10, 5])
+  repeatRule            String?
+  createdByUserId       String
+  status                String    @default("SCHEDULED") // SCHEDULED, COMPLETED, CANCELLED
+  sentReminders         Int[]     @default([])
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  guild                 GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+
+  @@index([guildId, status])
+  @@index([startsAt])
+  @@map("scheduled_events")
+}
+
+model AttendeeList {
+  id              String     @id @default(uuid())
+  guildId         String
+  title           String
+  description     String?
+  channelId       String
+  messageId       String?
+  maxSlots        Int?
+  closesAt        DateTime?
+  status          String     @default("OPEN") // OPEN, CLOSED, CANCELLED
+  createdByUserId String
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  guild           GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  attendees       Attendee[]
+
+  @@index([guildId])
+  @@map("attendee_lists")
+}
+
+model Attendee {
+  id        String       @id @default(uuid())
+  listId    String
+  userId    String
+  username  String
+  status    String       @default("CONFIRMED") // CONFIRMED, WAITLIST, CANCELLED
+  joinedAt  DateTime     @default(now())
+
+  list      AttendeeList @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  @@unique([listId, userId])
+  @@index([listId])
+  @@map("attendees")
+}
+
+model BirthdayConfig {
+  id                    String   @id @default(uuid())
+  guildId               String
+  userId                String
+  birthDate             DateTime
+  announcementChannelId String
+  customMessage         String?
+  enabled               Boolean  @default(true)
+  lastAnnouncedYear     Int?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  guild                 GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+
+  @@unique([guildId, userId])
+  @@index([guildId])
+  @@map("birthday_configs")
+}
+
+model NotificationLog {
+  id              String   @id @default(uuid())
+  guildId         String
+  module          String
+  eventType       String
+  targetChannelId String?
+  targetUserId    String?
+  success         Boolean
+  error           String?
+  createdAt       DateTime @default(now())
+
+  guild           GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+
+  @@index([guildId, createdAt])
+  @@map("notification_logs")
+}
+
+model VoiceHubConfig {
+  id               String   @id @default(uuid())
+  guildId          String
+  hubChannelId     String
+  targetCategoryId String
+  defaultUserLimit Int?
+  bitrate          Int?
+  namingTemplate   String   @default("🔊 Sala de {user}")
+  isPrivate        Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  guild            GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+
+  @@unique([guildId, hubChannelId])
+  @@index([guildId])
+  @@map("voice_hub_configs")
+}
+
+model ActiveVoiceChannel {
+  id                 String   @id @default(uuid())
+  guildId            String
+  channelId          String   @unique
+  ownerId            String
+  isLocked           Boolean  @default(false)
+  whitelistedUserIds String[] @default([])
+  createdAt          DateTime @default(now())
+
+  guild              GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+
+  @@index([guildId])
+  @@map("active_voice_channels")
+}
+
+model MonitoredServer {
+  id               String   @id @default(uuid())
+  guildId          String
+  name             String
+  gameType         String   // minecraft, source, generic_tcp
+  host             String
+  port             Int
+  queryPort        Int?
+  displayChannelId String
+  messageId        String?
+  intervalSeconds  Int      @default(60)
+  isActive         Boolean  @default(true)
+  lastStatus       String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  guild            GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+
+  @@index([guildId, isActive])
+  @@map("monitored_servers")
+}
+
+model WebhookConfig {
+  id              String   @id @default(uuid())
+  guildId         String   @unique
+  deployChannelId String?
+  alertsChannelId String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  guild           GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+
+  @@map("webhook_configs")
+}
+
+model CustomRoleConfig {
+  id             String      @id @default(uuid())
+  guildId        String      @unique
+  enabled        Boolean     @default(true)
+  anchorRoleId   String?
+  allowedRoleIds String[]    @default([])
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  guild          GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+
+  @@map("custom_role_configs")
+}
+
+model UserCustomRole {
+  id        String      @id @default(uuid())
+  guildId   String
+  userId    String
+  roleId    String      @unique
+  name      String
+  color     String
+  iconUrl   String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  guild     GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+
+  @@unique([guildId, userId])
+  @@index([guildId])
+  @@map("user_custom_roles")
+}
+
+model Quote {
+  id         String      @id @default(uuid())
+  guildId    String
+  authorId   String
+  authorName String
+  content    String
+  savedById  String
+  channelId  String
+  createdAt  DateTime    @default(now())
+
+  guild      GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+
+  @@index([guildId])
+  @@map("quotes")
+}
+
+model GameLobby {
+  id           String             @id @default(uuid())
+  guildId      String
+  gameName     String
+  startsAt     DateTime
+  maxPlayers   Int?
+  channelId    String
+  messageId    String?
+  creatorId    String
+  status       String             @default("OPEN") // OPEN, READY, CANCELLED
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  guild        GuildConfig        @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  participants LobbyParticipant[]
+
+  @@index([guildId, status])
+  @@map("game_lobbies")
+}
+
+model LobbyParticipant {
+  id       String    @id @default(uuid())
+  lobbyId  String
+  userId   String
+  username String
+  status   String    @default("CONFIRMED") // CONFIRMED, MAYBE
+  joinedAt DateTime  @default(now())
+
+  lobby    GameLobby @relation(fields: [lobbyId], references: [id], onDelete: Cascade)
+
+  @@unique([lobbyId, userId])
+  @@index([lobbyId])
+  @@map("lobby_participants")
+}
+
+model CommunityClip {
+  id          String      @id @default(uuid())
+  guildId     String
+  title       String
+  url         String
+  game        String?
+  submitterId String
+  channelId   String
+  messageId   String?
+  upvotes     Int         @default(0)
+  cringes     Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  guild       GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  votes       ClipVote[]
+
+  @@index([guildId])
+  @@map("community_clips")
+}
+
+model ClipVote {
+  id        String        @id @default(uuid())
+  clipId    String
+  userId    String
+  voteType  String        // UPVOTE, CRINGE
+  createdAt DateTime      @default(now())
+
+  clip      CommunityClip @relation(fields: [clipId], references: [id], onDelete: Cascade)
+
+  @@unique([clipId, userId])
+  @@index([clipId])
+  @@map("clip_votes")
+}
+
+model TribunalCase {
+  id                 String         @id @default(uuid())
+  guildId            String
+  defendantId        String
+  originalNickname   String?
+  punishmentNickname String
+  reason             String
+  durationHours      Int
+  votesYes           Int            @default(0)
+  votesNo            Int            @default(0)
+  status             String         @default("VOTING") // VOTING, GUILTY, INNOCENT, EXPIRED
+  channelId          String
+  messageId          String?
+  endsAt             DateTime
+  punishmentEndsAt   DateTime?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  guild              GuildConfig    @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+  votes              TribunalVote[]
+
+  @@index([guildId, status])
+  @@map("tribunal_cases")
+}
+
+model TribunalVote {
+  id        String       @id @default(uuid())
+  caseId    String
+  userId    String
+  vote      String       // YES, NO
+  createdAt DateTime     @default(now())
+
+  case      TribunalCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@unique([caseId, userId])
+  @@index([caseId])
+  @@map("tribunal_votes")
+}
+
+model VoiceActivityLog {
+  id              String      @id @default(uuid())
+  guildId         String
+  userId          String
+  channelId       String
+  joinedAt        DateTime
+  leftAt          DateTime
+  durationSeconds Int
+
+  guild           GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+
+  @@index([guildId, joinedAt])
+  @@index([userId])
+  @@map("voice_activity_logs")
+}
+
+model Countdown {
+  id         String      @id @default(uuid())
+  guildId    String
+  title      String
+  targetDate DateTime
+  channelId  String
+  createdAt  DateTime    @default(now())
+
+  guild      GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+
+  @@index([guildId])
+  @@map("countdowns")
+}
+
+model StreamerConfig {
+  id            String      @id @default(uuid())
+  guildId       String
+  streamerLogin String
+  discordUserId String?
+  channelId     String
+  lastStreamId  String?
+  isLive        Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  guild         GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+
+  @@unique([guildId, streamerLogin])
+  @@index([guildId])
+  @@index([streamerLogin])
+  @@map("streamer_configs")
+}
+
+
