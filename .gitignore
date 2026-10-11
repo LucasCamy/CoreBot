@@ -41,3 +41,8 @@ backup_data/
 backups/
 *.dump
 
+# Media rendering scratch files
+assets/branding/src/.frames/
+*.tmp
+
+

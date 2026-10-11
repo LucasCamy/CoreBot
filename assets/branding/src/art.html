@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Uganda Knuckles Art</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Rubik:wght@500;700;900&family=Noto+Sans:wght@400;600;700&display=block" rel="stylesheet">
+<style>
+  :root {
+    --black: #111111;
+    --ink: #1a0a0a;
+    --yellow: #fcdc04;
+    --red: #d90000;
+    --white: #ffffff;
+    --dc-bg: #313338;
+    --dc-embed: #2b2d31;
+    --dc-text: #dbdee1;
+    --dc-muted: #949ba4;
+    --dc-blurple: #5865f2;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--black); overflow: hidden; }
+  #stage { position: relative; overflow: hidden; }
+
+  /* Bandeira de Uganda: preto, amarelo, vermelho x2 */
+  .flag {
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom,
+      var(--black) 0 16.667%, var(--yellow) 16.667% 33.334%, var(--red) 33.334% 50%,
+      var(--black) 50% 66.667%, var(--yellow) 66.667% 83.334%, var(--red) 83.334% 100%);
+  }
+  .flag.tilt { inset: -25%; transform: rotate(-8deg); }
+  .grain {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(circle at 50% 50%, transparent 45%, rgba(0,0,0,.55) 100%),
+      repeating-linear-gradient(135deg, rgba(0,0,0,.07) 0 3px, transparent 3px 9px);
+  }
+  .halftone {
+    position: absolute; inset: 0; pointer-events: none; opacity: .22;
+    background-image: radial-gradient(var(--black) 28%, transparent 30%);
+    background-size: 18px 18px;
+    -webkit-mask-image: linear-gradient(90deg, #000, transparent 60%);
+            mask-image: linear-gradient(90deg, #000, transparent 60%);
+  }
+  .dim { position: absolute; inset: 0; background: rgba(10,10,10,.78); }
+
+  /* Disco branco da bandeira — o Knuckles toma o lugar do grou */
+  .disc {
+    position: absolute; border-radius: 50%; overflow: hidden;
+    background:
+      repeating-conic-gradient(from 0deg, rgba(255,120,0,.10) 0 7deg, transparent 7deg 18deg),
+      radial-gradient(circle at 50% 70%, #4a0b05 0, #140303 70%);
+    border: var(--ring, 12px) solid var(--black);
+    box-shadow: 0 0 0 calc(var(--ring, 12px) * .8) var(--white), 0 30px 60px rgba(0,0,0,.45);
+  }
+  .disc .flames { position: absolute; left: -5%; top: 4%; width: 110%; height: 100%; filter: drop-shadow(0 0 30px rgba(255,90,0,.6)); }
+  .disc::after { content: ''; position: absolute; inset: 0; border-radius: 50%; box-shadow: inset 0 0 80px rgba(0,0,0,.85); }
+  .char { position: absolute; filter: drop-shadow(0 18px 0 rgba(0,0,0,.25)); }
+  .char svg { width: 100%; height: auto; display: block; }
+
+  .title {
+    font-family: 'Bangers', cursive; font-weight: 400; line-height: .9;
+    color: var(--yellow); letter-spacing: .03em;
+    -webkit-text-stroke: var(--sw, 16px) var(--black); paint-order: stroke fill;
+    text-shadow: var(--sh, 10px) var(--sh, 10px) 0 var(--black);
+  }
+  .title .w { color: var(--white); }
+  .title .r { color: var(--red); }
+  .bubble {
+    position: absolute; background: var(--white); color: var(--black);
+    border: 8px solid var(--black); border-radius: 40px;
+    font-family: 'Bangers', cursive; letter-spacing: .04em; padding: .25em .6em .15em;
+    box-shadow: 10px 10px 0 var(--black); white-space: nowrap; z-index: 2;
+  }
+  .bubble::after {
+    content: ''; position: absolute; width: 60px; height: 60px; background: var(--white);
+    border-right: 8px solid var(--black); border-bottom: 8px solid var(--black);
+    bottom: -34px; left: var(--tail, 70%); transform: rotate(45deg) skew(12deg, 12deg); z-index: -1;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 14px; }
+  .chip {
+    font: 700 28px 'Rubik', sans-serif; color: var(--white); background: var(--black);
+    border: 4px solid var(--yellow); border-radius: 999px; padding: 10px 22px;
+    box-shadow: 6px 6px 0 rgba(0,0,0,.5); white-space: nowrap;
+  }
+  .chip.red { border-color: var(--red); }
+  .tagline {
+    display: inline-block; font: 900 34px 'Rubik', sans-serif; color: var(--black);
+    background: var(--white); border: 6px solid var(--black); padding: 8px 22px;
+    transform: rotate(-2deg); box-shadow: 8px 8px 0 var(--black);
+  }
+  .abs { position: absolute; }
+
+  /* Mockup estilo Discord */
+  .msg { display: flex; gap: 22px; font-family: 'Noto Sans', sans-serif; color: var(--dc-text);
+         background: var(--dc-bg); border-radius: 22px; padding: 30px 34px; box-shadow: 0 30px 80px rgba(0,0,0,.6);
+         border: 3px solid rgba(255,255,255,.06); }
+  .msg .av { flex: 0 0 84px; height: 84px; border-radius: 50%; overflow: hidden; position: relative; background: var(--yellow); border: 3px solid var(--black); }
+  .msg .av .char { width: 170%; left: -35%; top: -6%; filter: none; }
+  .msg .body { flex: 1; min-width: 0; }
+  .hdr { display: flex; align-items: center; gap: 12px; font-size: 26px; margin-bottom: 10px; }
+  .hdr b { color: #fff; font-weight: 700; }
+  .hdr .tag { background: var(--dc-blurple); color: #fff; font-size: 16px; font-weight: 700; padding: 2px 8px; border-radius: 6px; }
+  .hdr .time { color: var(--dc-muted); font-size: 19px; }
+  .embed { background: var(--dc-embed); border-left: 8px solid var(--bar, var(--yellow)); border-radius: 8px; padding: 22px 26px; font-size: 25px; line-height: 1.5; }
+  .embed .et { color: #fff; font-weight: 700; font-size: 28px; margin-bottom: 10px; }
+  .mention { background: rgba(88,101,242,.3); color: #c9cdfb; border-radius: 4px; padding: 0 4px; }
+  .btns { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+  .btn { font: 600 22px 'Noto Sans', sans-serif; color: #fff; background: #4e5058; border-radius: 8px; padding: 10px 20px; }
+  .btn.g { background: #248046; } .btn.r { background: #da373c; } .btn.b { background: var(--dc-blurple); }
+  .bar { height: 26px; border-radius: 6px; background: #1e1f22; overflow: hidden; margin: 6px 0 12px; }
+  .bar i { display: block; height: 100%; }
+
+  .sceneHead { position: absolute; right: 90px; top: 120px; width: 700px; text-align: right; }
+  .sceneHead .kicker { font: 900 30px 'Rubik', sans-serif; color: var(--yellow); letter-spacing: .25em; text-transform: uppercase; margin-bottom: 14px; }
+  .sceneHead p { font: 500 36px/1.35 'Rubik', sans-serif; color: #fff; margin-top: 26px; }
+  .cmd { display: inline-block; margin-top: 30px; font: 700 34px 'Rubik', monospace; color: var(--black); background: var(--yellow); padding: 8px 22px; border: 5px solid var(--black); border-radius: 12px; box-shadow: 7px 7px 0 var(--red); }
+
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; }
+  .tile { background: #1c1c1f; border: 4px solid var(--yellow); border-radius: 22px; padding: 26px 26px 22px; box-shadow: 8px 8px 0 var(--red); }
+  .tile .e { font-size: 58px; }
+  .tile h3 { font: 900 32px 'Rubik', sans-serif; color: #fff; margin: 8px 0 6px; }
+  .tile code { font: 700 24px 'Rubik', monospace; color: var(--yellow); }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script>
+// Personagem: Uganda Knuckles com faixa nas cores de Uganda, colar de contas e olhar malandro
+const CHAR = (id = 'k') => {
+  const beads = Array.from({ length: 11 }, (_, i) => {
+    const t = i / 10, u = 1 - t;
+    const x = u * u * 92 + 2 * u * t * 200 + t * t * 308;
+    const y = u * u * 300 + 2 * u * t * 418 + t * t * 300;
+    const big = i % 2 === 0;
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${big ? 17 : 13}" fill="${big ? '#c46a78' : '#e9c49a'}" stroke="#1a0a0a" stroke-width="5"/>
+      <circle cx="${(x - 5).toFixed(1)}" cy="${(y - 5).toFixed(1)}" r="${big ? 5 : 4}" fill="#fff" opacity=".55"/>`;
+  }).join('');
+  return `
+<svg viewBox="-20 0 440 470" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="${id}b" gradientUnits="userSpaceOnUse" cx="167" cy="135" r="230"><stop offset="0" stop-color="#f0453f"/><stop offset=".5" stop-color="#c8102e"/><stop offset="1" stop-color="#6e0912"/></radialGradient>
+    <radialGradient id="${id}t" cx="45%" cy="20%" r="85%"><stop offset="0" stop-color="#c8102e"/><stop offset="1" stop-color="#5c0710"/></radialGradient>
+    <radialGradient id="${id}m" cx="50%" cy="30%" r="75%"><stop offset="0" stop-color="#ffe8cc"/><stop offset="1" stop-color="#dba574"/></radialGradient>
+    <radialGradient id="${id}g" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#c9c9d2"/></radialGradient>
+    <clipPath id="${id}c"><ellipse cx="200" cy="190" rx="136" ry="124"/></clipPath>
+    <clipPath id="${id}el"><ellipse cx="168" cy="174" rx="32" ry="36"/></clipPath>
+    <clipPath id="${id}er"><ellipse cx="232" cy="174" rx="32" ry="36"/></clipPath>
+  </defs>
+  <ellipse cx="200" cy="456" rx="140" ry="12" fill="rgba(0,0,0,.3)"/>
+  <!-- dreads -->
+  <g fill="#9e0f1b" stroke="#1a0a0a" stroke-width="7" stroke-linejoin="round">
+    <path d="M96 150 C34 190 26 286 60 336 C82 290 102 246 122 200 Z"/>
+    <path d="M304 150 C366 190 374 286 340 336 C318 290 298 246 278 200 Z"/>
+    <path d="M118 92 C62 98 26 152 30 212 C66 180 98 160 140 144 Z"/>
+    <path d="M282 92 C338 98 374 152 370 212 C334 180 302 160 260 144 Z"/>
+  </g>
+  <!-- tenis amarelos -->
+  <g stroke="#1a0a0a" stroke-width="7" stroke-linejoin="round">
+    <path d="M100 440 q0 -34 44 -34 h32 q24 0 24 30 v10 q0 12 -12 12 h-76 q-12 0 -12 -12 z" fill="#fcdc04"/>
+    <path d="M200 436 q0 -30 24 -30 h32 q44 0 44 34 v6 q0 12 -12 12 h-76 q-12 0 -12 -12 z" fill="#fcdc04"/>
+  </g>
+  <!-- tronco -->
+  <path d="M96 420 C84 330 120 280 200 280 C280 280 316 330 304 420 Q200 444 96 420 Z" fill="url(#${id}t)" stroke="#1a0a0a" stroke-width="7" stroke-linejoin="round"/>
+  <!-- bracos -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M118 320 Q92 340 82 368" stroke="#1a0a0a" stroke-width="34"/>
+    <path d="M118 320 Q92 340 82 368" stroke="#a50d1e" stroke-width="22"/>
+    <path d="M282 320 Q308 340 318 368" stroke="#1a0a0a" stroke-width="34"/>
+    <path d="M282 320 Q308 340 318 368" stroke="#a50d1e" stroke-width="22"/>
+  </g>
+  <!-- colar de contas -->
+  ${beads}
+  <!-- cabeca -->
+  <ellipse cx="200" cy="190" rx="136" ry="124" fill="url(#${id}b)" stroke="#1a0a0a" stroke-width="8"/>
+  <!-- faixa preto/amarelo/vermelho -->
+  <g clip-path="url(#${id}c)" fill="none" stroke-width="14">
+    <path d="M40 112 Q200 34 360 112" stroke="#111"/>
+    <path d="M40 126 Q200 48 360 126" stroke="#fcdc04"/>
+    <path d="M40 140 Q200 62 360 140" stroke="#d90000"/>
+    <path d="M40 105 Q200 27 360 105" stroke="#1a0a0a" stroke-width="3"/>
+    <path d="M40 147 Q200 69 360 147" stroke="#1a0a0a" stroke-width="3"/>
+  </g>
+  <!-- pontas da faixa ao vento -->
+  <g stroke="#1a0a0a" stroke-width="6" stroke-linejoin="round">
+    <path d="M326 112 C356 82 384 96 400 58 C410 92 392 116 348 130 Z" fill="#ffb000"/>
+    <path d="M330 134 C372 132 396 160 424 146 C412 182 372 176 334 148 Z" fill="#fcdc04"/>
+    <path d="M318 112 L346 120 L340 146 L314 140 Z" fill="#ff8a00"/>
+  </g>
+  <!-- focinho -->
+  <ellipse cx="200" cy="250" rx="112" ry="68" fill="url(#${id}m)" stroke="#1a0a0a" stroke-width="7"/>
+  <!-- olhos semicerrados -->
+  <ellipse cx="168" cy="174" rx="32" ry="36" fill="#fff"/>
+  <ellipse cx="232" cy="174" rx="32" ry="36" fill="#fff"/>
+  <g clip-path="url(#${id}el)"><circle cx="180" cy="188" r="15" fill="#3b2a8c"/><circle cx="182" cy="189" r="7.5" fill="#0b0b14"/><circle cx="176" cy="183" r="4" fill="#fff"/></g>
+  <g clip-path="url(#${id}er)"><circle cx="244" cy="188" r="15" fill="#3b2a8c"/><circle cx="246" cy="189" r="7.5" fill="#0b0b14"/><circle cx="240" cy="183" r="4" fill="#fff"/></g>
+  <g fill="none" stroke="#1a0a0a" stroke-width="6">
+    <ellipse cx="168" cy="174" rx="32" ry="36"/><ellipse cx="232" cy="174" rx="32" ry="36"/>
+  </g>
+  <path d="M128 174 Q168 152 202 166 Q232 152 272 174 L272 124 L128 124 Z" fill="url(#${id}b)"/>
+  <g fill="none" stroke="#1a0a0a" stroke-linecap="round">
+    <path d="M135 172 Q168 152 200 166 Q232 152 265 172" stroke-width="7"/>
+    <path d="M144 202 Q168 212 194 204" stroke-width="4"/>
+    <path d="M206 204 Q232 212 256 202" stroke-width="4"/>
+    <path d="M134 140 Q166 122 194 136" stroke-width="7"/>
+    <path d="M206 136 Q234 122 266 140" stroke-width="7"/>
+  </g>
+  <!-- nariz -->
+  <ellipse cx="200" cy="226" rx="20" ry="13" fill="#2a0d0d"/>
+  <ellipse cx="193" cy="221" rx="7" ry="4" fill="#fff" opacity=".7"/>
+  <!-- sorriso -->
+  <path d="M128 252 Q204 326 274 246 Q200 278 128 252 Z" fill="#5a0f14" stroke="#1a0a0a" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M140 258 Q204 282 262 252 L258 262 Q202 292 144 268 Z" fill="#fff"/>
+  <ellipse cx="208" cy="290" rx="22" ry="8" fill="#ff7b8a"/>
+  <!-- luvas -->
+  <g stroke="#1a0a0a" stroke-width="7" stroke-linejoin="round">
+    <path d="M56 342 L62 312 L78 336 Z" fill="#ececf1"/>
+    <path d="M80 336 L92 308 L102 340 Z" fill="#ececf1"/>
+    <circle cx="80" cy="376" r="40" fill="url(#${id}g)"/>
+    <path d="M298 340 L308 308 L320 336 Z" fill="#ececf1"/>
+    <path d="M322 336 L338 312 L344 342 Z" fill="#ececf1"/>
+    <circle cx="320" cy="376" r="40" fill="url(#${id}g)"/>
+  </g>
+</svg>`;
+};
+
+// Fogo procedural (seed fixa = sempre o mesmo resultado)
+const FLAMES = (id, seed = 7) => {
+  let s = seed;
+  const rnd = () => ((s = (s * 16807) % 2147483647) / 2147483647);
+  const layers = [['#8a0a00', 0.92, 80], ['#d91a00', 0.76, 70], ['#ff5a00', 0.6, 60], ['#ff9a00', 0.44, 50], ['#ffd000', 0.28, 40]];
+  const paths = layers.map(([c, hmax, bw]) => {
+    let d = '';
+    for (let x = -bw; x < 1000 + bw; x += bw * 0.7) {
+      const ht = 1000 * hmax * (0.45 + rnd() * 0.55), off = (rnd() - 0.5) * bw * 1.6, b = 1000;
+      d += `M${x - bw} ${b} C${x - bw} ${b - ht * 0.45} ${x + off - bw * 0.15} ${b - ht * 0.75} ${x + off} ${b - ht} C${x + off + bw * 0.15} ${b - ht * 0.75} ${x + bw} ${b - ht * 0.45} ${x + bw} ${b} Z `;
+    }
+    return `<path d="${d}" fill="${c}"/>`;
+  }).join('');
+  return `<svg class="flames" viewBox="0 0 1000 1000" preserveAspectRatio="none">
+    <defs><filter id="${id}f" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.006 0.018" numOctaves="2" seed="${seed}"/>
+      <feDisplacementMap in="SourceGraphic" scale="40"/></filter></defs>
+    <g filter="url(#${id}f)">${paths}</g></svg>`;
+};
+
+const W = { banner: [1500, 600], cover: [1920, 1080], thumb: [1280, 720], avatar: [1024, 1024] };
+const v = new URLSearchParams(location.search).get('v') || 'cover';
+const [w, h] = W[v] || [1920, 1080];
+const stage = document.getElementById('stage');
+stage.style.width = w + 'px'; stage.style.height = h + 'px';
+document.body.style.width = w + 'px'; document.body.style.height = h + 'px';
+
+const bg = (tilt = false, extra = '') => `<div class="flag ${tilt ? 'tilt' : ''}"></div><div class="halftone"></div><div class="grain"></div>${extra}`;
+const disc = (x, y, d, ring = 12) => `<div class="disc" style="left:${x}px;top:${y}px;width:${d}px;height:${d}px;--ring:${ring}px">${FLAMES('f' + x + y, x % 97 + 3)}</div>`;
+const char = (x, y, wd, id) => `<div class="char" style="left:${x}px;top:${y}px;width:${wd}px">${CHAR(id)}</div>`;
+const avatarMini = (id) => `<div class="av"><div class="char">${CHAR(id)}</div></div>`;
+const msgHead = (time) => `<div class="hdr"><b>Uganda Knuckles</b><span class="tag">✔ APP</span><span class="time">${time}</span></div>`;
+
+const views = {
+  banner: () => `${bg()}
+    ${disc(1010, 50, 500, 12)}
+    ${char(1020, 70, 470, 'a')}
+    <div class="abs title" style="left:120px;top:58px;font-size:150px;--sw:18px;--sh:10px">UGANDA<br><span class="w">KNUCKLES</span></div>
+    <div class="bubble" style="left:440px;top:400px;font-size:58px;--tail:86%;transform:rotate(-2deg)">DO YOU KNOW DA WAE?</div>`,
+
+  cover: () => `${bg(true)}
+    ${disc(110, 150, 780, 16)}
+    ${char(140, 190, 720, 'a')}
+    <div class="bubble" style="left:560px;top:70px;font-size:64px;--tail:18%;transform:rotate(-4deg)">DO YOU KNOW DA WAE?</div>
+    <div class="abs" style="left:960px;top:250px;width:900px">
+      <div class="title" style="font-size:190px;--sw:20px;--sh:12px">UGANDA<br><span class="w">KNUCKLES</span></div>
+      <div style="margin:44px 0 36px"><span class="tagline">O bot que conhece o caminho do seu servidor</span></div>
+      <div class="chips">
+        <span class="chip">🎙️ Salas de voz</span><span class="chip red">🎮 Lobbies /jogar</span>
+        <span class="chip red">⚖️ Tribunal</span><span class="chip">💬 Pérolas</span>
+        <span class="chip">🔊 Soundboard</span><span class="chip red">📡 Lives Twitch</span>
+      </div>
+    </div>`,
+
+  thumb: () => `${bg(true)}
+    ${disc(700, 60, 640, 14)}
+    ${char(720, 90, 600, 'a')}
+    <div class="abs title" style="left:60px;top:70px;font-size:150px;--sw:18px;--sh:10px;transform:rotate(-5deg)">DO YOU<br><span class="w">KNOW</span><br><span class="w">DA WAE?</span></div>
+    <div class="abs" style="left:70px;top:560px"><div class="chips">
+      <span class="chip" style="font-size:30px">/jogar</span><span class="chip red" style="font-size:30px">/sala</span><span class="chip" style="font-size:30px">/tribunal</span>
+    </div></div>
+    <div class="abs tagline" style="left:880px;top:22px;font-size:34px;white-space:nowrap;background:var(--red);color:#fff;transform:rotate(4deg)">BOT DE DISCORD</div>`,
+
+  avatar: () => `${bg()}
+    ${disc(62, 62, 900, 18)}
+    ${char(92, 120, 840, 'a')}`,
+
+  s1: () => `${bg(true)}
+    ${disc(560, 110, 800, 16)}
+    ${char(600, 150, 720, 'a')}
+    <div class="abs title" style="left:0;width:1920px;text-align:center;top:40px;font-size:150px;--sw:18px">UGANDA <span class="w">KNUCKLES</span></div>
+    <div class="abs" style="left:0;width:1920px;text-align:center;top:930px"><span class="tagline" style="font-size:44px">O bot que conhece o caminho 👑</span></div>`,
+
+  s2: () => `${bg(false, '<div class="dim"></div>')}
+    <div class="abs" style="left:90px;top:200px;width:1000px"><div class="msg">${avatarMini('m')}<div class="body">${msgHead('Hoje às 20:15')}
+      <div class="embed"><div class="et">🎙️ Painel de Controle da Sala</div>
+      👑 <b>Dono da sala:</b> <span class="mention">@Lucas</span><br>🔒 <b>Status:</b> Trancada (privada)<br>👥 <b>Limite:</b> 3 / 5<br><br>Use os botões para gerenciar sua sala em tempo real.</div>
+      <div class="btns"><span class="btn">🔒 Trancar</span><span class="btn">➕ Convidar</span><span class="btn r">🚫 Expulsar</span><span class="btn">👥 Limite</span><span class="btn">✏️ Renomear</span><span class="btn b">👑 Passar liderança</span></div>
+    </div></div></div>
+    <div class="sceneHead"><div class="kicker">Voz dinâmica</div><div class="title" style="font-size:130px">SALAS<br><span class="w">DE VOZ</span></div>
+      <p>Entre no canal e o Knuckles cria a sua sala. Tranque, convide e expulse quem não conhece o caminho.</p><span class="cmd">/sala</span></div>
+    ${char(1560, 760, 340, 'p')}`,
+
+  s3: () => `${bg(false, '<div class="dim"></div>')}
+    <div class="abs" style="left:90px;top:170px;width:1000px"><div class="msg">${avatarMini('m')}<div class="body">${msgHead('Hoje às 21:00')}
+      <div class="embed" style="--bar:#d90000"><div class="et">🎮 Lobby: Valorant Competitivo</div>
+      👑 <b>Líder:</b> <span class="mention">@Rodrigo</span> · 🎯 Competitivo<br>👥 <b>Vagas:</b> 3 / 5<br><br>
+      1. <span class="mention">@Rodrigo</span> (líder)<br>2. <span class="mention">@Gabriel</span><br>3. <span class="mention">@Matheus</span><br>⏳ Aberto há 5 minutos</div>
+      <div class="btns"><span class="btn g">🟢 Entrar na call</span><span class="btn r">🔴 Sair</span><span class="btn b">🔔 Chamar o clã</span></div>
+    </div></div></div>
+    <div class="sceneHead"><div class="kicker">Junte o clã</div><div class="title" style="font-size:130px">LOBBIES<br><span class="w">DE JOGO</span></div>
+      <p>Monte o time, confirme as vagas e o bot marca todo mundo quando fechar.</p><span class="cmd">/jogar</span></div>
+    ${char(1560, 760, 340, 'p')}`,
+
+  s4: () => `${bg(false, '<div class="dim"></div>')}
+    <div class="abs" style="left:90px;top:170px;width:1000px"><div class="msg">${avatarMini('m')}<div class="body">${msgHead('Hoje às 22:40')}
+      <div class="embed" style="--bar:#fcdc04"><div class="et">⚖️ Tribunal do Servidor · Caso #042</div>
+      👤 <b>Réu:</b> <span class="mention">@Bruno</span> · 🏛️ <b>Acusador:</b> <span class="mention">@Felipe</span><br>
+      📜 <b>Motivo:</b> não sabe o caminho<br>⏳ Tempo restante: 06 min<br>
+      🟩 INOCENTE · 3 votos<div class="bar"><i style="width:30%;background:#248046"></i></div>
+      🟥 CULPADO · 7 votos<div class="bar"><i style="width:70%;background:#da373c"></i></div></div>
+      <div class="btns"><span class="btn g">🟩 Votar inocente</span><span class="btn r">🟥 Votar culpado</span></div>
+    </div></div></div>
+    <div class="sceneHead"><div class="kicker">Justiça do clã</div><div class="title" style="font-size:130px">TRIBU<span class="w">NAL</span></div>
+      <p>A galera vota e o culpado ganha um apelido de castigo temporário.</p><span class="cmd">/tribunal</span></div>
+    ${char(1560, 760, 340, 'p')}`,
+
+  s5: () => `${bg(false, '<div class="dim"></div>')}
+    <div class="abs title" style="left:0;width:1920px;text-align:center;top:90px;font-size:120px">E MUITO <span class="w">MAIS</span></div>
+    <div class="abs grid" style="left:110px;top:320px;width:1700px">
+      ${[['💬','Pérolas','/perola'],['🎬','Clipes','/clip'],['🔊','Soundboard','/tocar'],['📡','Lives Twitch','/stream'],
+         ['🖥️','Servidores','/server'],['🎂','Aniversários','/aniversario'],['📅','Agenda','/agenda'],['📝','Notas','/notas']]
+        .map(([e,t,c]) => `<div class="tile"><div class="e">${e}</div><h3>${t}</h3><code>${c}</code></div>`).join('')}
+    </div>
+    <div class="abs" style="left:110px;top:840px;width:1300px;font:500 34px/1.4 'Rubik',sans-serif;color:#fff">+ Wrapped do servidor, cargos personalizados, listas de presença e avisos de entrada na call.</div>
+    ${char(1540, 740, 340, 'p')}`,
+
+  s6: () => `${bg(true)}
+    ${disc(160, 190, 760, 16)}
+    ${char(190, 230, 700, 'a')}
+    <div class="bubble" style="left:640px;top:90px;font-size:70px;--tail:16%;transform:rotate(-4deg)">DO YOU KNOW DA WAE?</div>
+    <div class="abs" style="left:1000px;top:360px;width:860px">
+      <div class="title" style="font-size:120px;--sw:16px">ADICIONE O<br><span class="w">UGANDA</span><br><span class="w">KNUCKLES</span></div>
+      <div style="margin-top:44px"><span class="tagline" style="font-size:40px">Siga o caminho. Junte-se ao clã. 👑</span></div>
+    </div>`,
+};
+
+stage.innerHTML = (views[v] || views.cover)();
+</script>
+</body>
+</html>
