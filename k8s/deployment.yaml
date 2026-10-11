@@ -1,9 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: corebot
+  name: corebot-app
+  namespace: corebot
   labels:
-    app: corebot
+    app: corebot-app
 spec:
   replicas: 1
   strategy:
@@ -13,14 +14,27 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      app: corebot
+      app: corebot-app
   template:
     metadata:
       labels:
-        app: corebot
+        app: corebot-app
     spec:
-      imagePullSecrets:
-        - name: ghcr-secret
+      initContainers:
+        - name: seed-sounds
+          image: ghcr.io/lucascamy/corebot:latest
+          imagePullPolicy: Always
+          command:
+            - sh
+            - -c
+            - |
+              mkdir -p /mnt/sounds
+              if [ -d "/app/assets/sounds" ]; then
+                cp -n -r /app/assets/sounds/* /mnt/sounds/ 2>/dev/null || true
+              fi
+          volumeMounts:
+            - mountPath: /mnt/sounds
+              name: sound-assets
       containers:
         - name: corebot
           image: ghcr.io/lucascamy/corebot:latest
@@ -29,35 +43,73 @@ spec:
             - name: http
               containerPort: 3000
               protocol: TCP
-          envFrom:
-            - secretRef:
-                name: corebot-secrets
-            - configMapRef:
-                name: corebot-config
-                optional: true
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: BOT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: corebot-secrets
+                  key: BOT_TOKEN
+            - name: DISCORD_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: corebot-secrets
+                  key: DISCORD_CLIENT_ID
+            - name: DISCORD_ALLOWED_GUILD_IDS
+              valueFrom:
+                secretKeyRef:
+                  name: corebot-secrets
+                  key: DISCORD_ALLOWED_GUILD_IDS
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: corebot-secrets
+                  key: DATABASE_URL
+            - name: REDIS_HOST
+              value: "corebot-redis"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: PORT
+              value: "3000"
+            - name: TIMEZONE
+              value: "America/Sao_Paulo"
+            - name: LOG_LEVEL
+              value: "info"
+            - name: ADMIN_DASHBOARD_USER
+              valueFrom:
+                secretKeyRef:
+                  name: corebot-secrets
+                  key: ADMIN_DASHBOARD_USER
+            - name: ADMIN_DASHBOARD_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: corebot-secrets
+                  key: ADMIN_DASHBOARD_PASS
+            - name: WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: corebot-secrets
+                  key: WEBHOOK_SECRET
           resources:
             requests:
-              cpu: '100m'
-              memory: '256Mi'
+              cpu: 100m
+              memory: 256Mi
             limits:
-              cpu: '1000m'
-              memory: '1Gi'
+              cpu: 1000m
+              memory: 1024Mi
           livenessProbe:
             httpGet:
               path: /health
               port: 3000
             initialDelaySeconds: 30
-            periodSeconds: 15
-            timeoutSeconds: 5
-            failureThreshold: 3
+            periodSeconds: 20
           readinessProbe:
             httpGet:
               path: /health
               port: 3000
             initialDelaySeconds: 15
             periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 3
           volumeMounts:
             - name: sound-assets
               mountPath: /app/assets/sounds
