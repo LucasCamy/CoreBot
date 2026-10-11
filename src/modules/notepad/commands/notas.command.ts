@@ -5,10 +5,10 @@ import { createNotepadListSchema } from '../schemas/notepad.schema.js';
 import { NotepadService } from '../services/notepad.service.js';
 import { PermissionGuard } from '../../../discord/guards/permission.guard.js';
 
-export const listaCommand: ICommand = {
+export const notasCommand: ICommand = {
   data: new SlashCommandBuilder()
-    .setName('lista')
-    .setDescription('Gerencia listas dinâmicas, blocos de notas e checklists colaborativos')
+    .setName('notas')
+    .setDescription('Gerencia blocos de notas, tarefas e checklists dinâmicos e colaborativos')
     // Subcommand: criar
     .addSubcommand((sub) =>
       sub
@@ -17,17 +17,17 @@ export const listaCommand: ICommand = {
         .addStringOption((opt) =>
           opt
             .setName('titulo')
-            .setDescription('Título da lista ou bloco de notas')
+            .setDescription('Título do bloco de notas ou checklist')
             .setRequired(true),
         )
         .addStringOption((opt) =>
           opt
             .setName('descricao')
-            .setDescription('Descrição ou observações opcionais para a lista'),
+            .setDescription('Descrição ou observações adicionais'),
         )
         .addBooleanOption((opt) =>
           opt
-            .setName('colaborativa')
+            .setName('colaborativo')
             .setDescription('Permitir que outros membros adicionem e marquem itens? (Padrão: sim)'),
         )
         .addStringOption((opt) =>
@@ -40,7 +40,7 @@ export const listaCommand: ICommand = {
     .addSubcommand((sub) =>
       sub
         .setName('listar')
-        .setDescription('Lista todos os blocos de notas deste servidor'),
+        .setDescription('Lista todos os blocos de notas ativos deste servidor'),
     )
     // Subcommand: apagar
     .addSubcommand((sub) =>
@@ -50,7 +50,7 @@ export const listaCommand: ICommand = {
         .addStringOption((opt) =>
           opt
             .setName('id')
-            .setDescription('ID da lista a ser excluída')
+            .setDescription('ID do bloco de notas a ser excluído')
             .setRequired(true),
         ),
     ),
@@ -64,7 +64,7 @@ export const listaCommand: ICommand = {
     if (subcommand === 'criar') {
       const title = interaction.options.getString('titulo', true);
       const description = interaction.options.getString('descricao');
-      const isCollaborative = interaction.options.getBoolean('colaborativa') ?? true;
+      const isCollaborative = interaction.options.getBoolean('colaborativo') ?? true;
       const color = interaction.options.getString('cor') ?? '#5865F2';
 
       const validation = createNotepadListSchema.safeParse({
@@ -117,7 +117,7 @@ export const listaCommand: ICommand = {
           embeds: [
             BotEmbed.info(
               'Nenhum Bloco de Notas',
-              'Não há listas criadas neste servidor ainda. Crie uma agora usando `/lista criar`!',
+              'Não há blocos de notas criados neste servidor ainda. Crie um agora usando `/notas criar`!',
             ),
           ],
           ephemeral: true,
@@ -129,7 +129,7 @@ export const listaCommand: ICommand = {
         .map((l, idx) => {
           const total = l.items.length;
           const completed = l.items.filter((i) => i.isCompleted).length;
-          const mode = l.isCollaborative ? '👥 Colaborativa' : '🔒 Privada';
+          const mode = l.isCollaborative ? '👥 Colaborativo' : '🔒 Pessoal';
 
           return `**${idx + 1}. ${l.title}**\n` +
             `└ ID: \`${l.id}\` | Itens: ${completed}/${total} | Modo: ${mode} | Canal: <#${l.channelId}> | Criador: <@${l.ownerId}>`;
@@ -149,7 +149,7 @@ export const listaCommand: ICommand = {
 
       if (!list || list.guildId !== guildId) {
         await interaction.reply({
-          embeds: [BotEmbed.error('Lista Não Encontrada', `Nenhum bloco de notas com o ID \`${listId}\`.`)],
+          embeds: [BotEmbed.error('Bloco Não Encontrado', `Nenhum bloco de notas com o ID \`${listId}\`.`)],
           ephemeral: true,
         });
         return;
@@ -160,7 +160,7 @@ export const listaCommand: ICommand = {
 
       if (!isOwner && !isAdmin) {
         await interaction.reply({
-          embeds: [BotEmbed.error('Sem Permissão', 'Apenas o criador da lista ou administradores podem apagá-la.')],
+          embeds: [BotEmbed.error('Sem Permissão', 'Apenas o criador do bloco ou administradores podem apagá-lo.')],
           ephemeral: true,
         });
         return;
@@ -181,7 +181,7 @@ export const listaCommand: ICommand = {
       }
 
       await interaction.reply({
-        embeds: [BotEmbed.success('Lista Excluída', `O bloco de notas "${list.title}" foi apagado permanentemente.`)],
+        embeds: [BotEmbed.success('Bloco Excluído', `O bloco de notas "${list.title}" foi apagado permanentemente.`)],
         ephemeral: true,
       });
       return;

@@ -161,7 +161,8 @@ O CoreBot é composto por 17 submódulos desacoplados organizados por domínio:
 | **Wrapped & Social** | `/wrapped` & `/countdown` | Métricas de tempo em voz, badges sociais, despedida noturna bem-humorada e contagens regressivas. |
 | **Custom Roles** | `/meucargo` | Criação de cargos cosméticos com cor hexadecimal, posicionados sob cargo âncora seguro (`perms: 0n`). |
 | **Agenda & Reuniões** | `/agenda` | Marcação de eventos com lembretes progressivos (60, 30, 10 min) respeitando o fuso do servidor. |
-| **Listas de Presença** | `/lista` | Confirmação de presença em eventos com botões interativos e exportação em CSV. |
+| **Listas de Presença** | `/lista` & `/presenca` | Confirmação de presença em eventos com botões interativos e exportação em CSV. |
+| **Bloco de Notas & Checklists** | `/notas` | Listas dinâmicas colaborativas com checkboxes, barra de progresso visual e edição em tempo real. |
 | **Aniversários** | `/aniversario` | Cadastro e felicitações automáticas na data comemorativa com cálculo de idade. |
 | **Webhooks Internos** | `/webhook` | Endpoints HTTP Fastify autenticados para alertas de CI/CD (GitHub/GitLab) e Uptime. |
 | **Administração Geral** | `/bot` | Backup seguro do banco de dados no Discord, auditoria de canais e healthcheck. |

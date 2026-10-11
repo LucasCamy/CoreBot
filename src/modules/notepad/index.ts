@@ -1,5 +1,5 @@
 import { IModule } from '../../types/index.js';
-import { listaCommand } from './commands/lista.command.js';
+import { notasCommand } from './commands/notas.command.js';
 import {
   notepadAddButton,
   notepadToggleButton,
@@ -20,7 +20,7 @@ import {
 export const NotepadModule: IModule = {
   name: 'notepad',
   description: 'Sistema dinâmico e interativo de bloco de notas, listas e checklists colaborativos',
-  commands: [listaCommand],
+  commands: [notasCommand],
   buttonHandlers: [
     notepadAddButton,
     notepadToggleButton,
