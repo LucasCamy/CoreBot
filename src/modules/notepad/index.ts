@@ -31,11 +31,7 @@ export const NotepadModule: IModule = {
     notepadToggleModeButton,
     notepadDeleteListButton,
   ],
-  modalHandlers: [
-    notepadAddModalHandler,
-    notepadEditModalHandler,
-    notepadCustomizeModalHandler,
-  ],
+  modalHandlers: [notepadAddModalHandler, notepadEditModalHandler, notepadCustomizeModalHandler],
   selectMenuHandlers: [
     notepadToggleSelectHandler,
     notepadDeleteSelectHandler,

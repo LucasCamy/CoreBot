@@ -21,9 +21,7 @@ export const notasCommand: ICommand = {
             .setRequired(true),
         )
         .addStringOption((opt) =>
-          opt
-            .setName('descricao')
-            .setDescription('Descrição ou observações adicionais'),
+          opt.setName('descricao').setDescription('Descrição ou observações adicionais'),
         )
         .addBooleanOption((opt) =>
           opt
@@ -31,16 +29,12 @@ export const notasCommand: ICommand = {
             .setDescription('Permitir que outros membros adicionem e marquem itens? (Padrão: sim)'),
         )
         .addStringOption((opt) =>
-          opt
-            .setName('cor')
-            .setDescription('Cor hex do embed (ex: #5865F2, #2ECC71, #E74C3C)'),
+          opt.setName('cor').setDescription('Cor hex do embed (ex: #5865F2, #2ECC71, #E74C3C)'),
         ),
     )
     // Subcommand: listar
     .addSubcommand((sub) =>
-      sub
-        .setName('listar')
-        .setDescription('Lista todos os blocos de notas ativos deste servidor'),
+      sub.setName('listar').setDescription('Lista todos os blocos de notas ativos deste servidor'),
     )
     // Subcommand: apagar
     .addSubcommand((sub) =>
@@ -48,10 +42,7 @@ export const notasCommand: ICommand = {
         .setName('apagar')
         .setDescription('Exclui um bloco de notas existente')
         .addStringOption((opt) =>
-          opt
-            .setName('id')
-            .setDescription('ID do bloco de notas a ser excluído')
-            .setRequired(true),
+          opt.setName('id').setDescription('ID do bloco de notas a ser excluído').setRequired(true),
         ),
     ),
 
@@ -131,8 +122,10 @@ export const notasCommand: ICommand = {
           const completed = l.items.filter((i) => i.isCompleted).length;
           const mode = l.isCollaborative ? '👥 Colaborativo' : '🔒 Pessoal';
 
-          return `**${idx + 1}. ${l.title}**\n` +
-            `└ ID: \`${l.id}\` | Itens: ${completed}/${total} | Modo: ${mode} | Canal: <#${l.channelId}> | Criador: <@${l.ownerId}>`;
+          return (
+            `**${idx + 1}. ${l.title}**\n` +
+            `└ ID: \`${l.id}\` | Itens: ${completed}/${total} | Modo: ${mode} | Canal: <#${l.channelId}> | Criador: <@${l.ownerId}>`
+          );
         })
         .join('\n\n');
 
@@ -149,7 +142,9 @@ export const notasCommand: ICommand = {
 
       if (!list || list.guildId !== guildId) {
         await interaction.reply({
-          embeds: [BotEmbed.error('Bloco Não Encontrado', `Nenhum bloco de notas com o ID \`${listId}\`.`)],
+          embeds: [
+            BotEmbed.error('Bloco Não Encontrado', `Nenhum bloco de notas com o ID \`${listId}\`.`),
+          ],
           ephemeral: true,
         });
         return;
@@ -160,7 +155,12 @@ export const notasCommand: ICommand = {
 
       if (!isOwner && !isAdmin) {
         await interaction.reply({
-          embeds: [BotEmbed.error('Sem Permissão', 'Apenas o criador do bloco ou administradores podem apagá-lo.')],
+          embeds: [
+            BotEmbed.error(
+              'Sem Permissão',
+              'Apenas o criador do bloco ou administradores podem apagá-lo.',
+            ),
+          ],
           ephemeral: true,
         });
         return;
@@ -181,7 +181,12 @@ export const notasCommand: ICommand = {
       }
 
       await interaction.reply({
-        embeds: [BotEmbed.success('Bloco Excluído', `O bloco de notas "${list.title}" foi apagado permanentemente.`)],
+        embeds: [
+          BotEmbed.success(
+            'Bloco Excluído',
+            `O bloco de notas "${list.title}" foi apagado permanentemente.`,
+          ),
+        ],
         ephemeral: true,
       });
       return;

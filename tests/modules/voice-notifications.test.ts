@@ -113,8 +113,16 @@ describe('Voice Notifications Module - Multi-Rule Support', () => {
       };
 
       // 1. Simulate user joining voice-general
-      const oldStateJoin = { channelId: null, member: mockMember, guild: mockMember.guild } as unknown as VoiceState;
-      const newStateJoin = { channelId: 'voice-general', member: mockMember, guild: mockMember.guild } as unknown as VoiceState;
+      const oldStateJoin = {
+        channelId: null,
+        member: mockMember,
+        guild: mockMember.guild,
+      } as unknown as VoiceState;
+      const newStateJoin = {
+        channelId: 'voice-general',
+        member: mockMember,
+        guild: mockMember.guild,
+      } as unknown as VoiceState;
 
       await service.handleVoiceStateUpdate(oldStateJoin, newStateJoin);
 
@@ -130,8 +138,16 @@ describe('Voice Notifications Module - Multi-Rule Support', () => {
       mockNotificationService.sendToChannel.mockClear();
 
       // 2. Simulate user leaving voice-general
-      const oldStateLeave = { channelId: 'voice-general', member: mockMember, guild: mockMember.guild } as unknown as VoiceState;
-      const newStateLeave = { channelId: null, member: mockMember, guild: mockMember.guild } as unknown as VoiceState;
+      const oldStateLeave = {
+        channelId: 'voice-general',
+        member: mockMember,
+        guild: mockMember.guild,
+      } as unknown as VoiceState;
+      const newStateLeave = {
+        channelId: null,
+        member: mockMember,
+        guild: mockMember.guild,
+      } as unknown as VoiceState;
 
       await service.handleVoiceStateUpdate(oldStateLeave, newStateLeave);
 

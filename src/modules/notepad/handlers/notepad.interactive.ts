@@ -17,10 +17,7 @@ import {
 import { BotEmbed } from '../../../utils/embed.builder.js';
 import { PermissionGuard } from '../../../discord/guards/permission.guard.js';
 import { NotepadService } from '../services/notepad.service.js';
-import {
-  addNotepadItemSchema,
-  customizeNotepadListSchema,
-} from '../schemas/notepad.schema.js';
+import { addNotepadItemSchema, customizeNotepadListSchema } from '../schemas/notepad.schema.js';
 
 async function checkPermission(
   ctx: ButtonContext | ModalContext | SelectMenuContext,
@@ -57,7 +54,9 @@ export const notepadAddButton: IButtonHandler = {
 
     if (!list) {
       await ctx.interaction.reply({
-        embeds: [BotEmbed.error('Lista Não Encontrada', 'Esta lista não existe mais no banco de dados.')],
+        embeds: [
+          BotEmbed.error('Lista Não Encontrada', 'Esta lista não existe mais no banco de dados.'),
+        ],
         ephemeral: true,
       });
       return;
@@ -65,7 +64,12 @@ export const notepadAddButton: IButtonHandler = {
 
     if (!allowed) {
       await ctx.interaction.reply({
-        embeds: [BotEmbed.error('Acesso Restrito', 'Esta lista é privada. Apenas o criador pode adicionar itens.')],
+        embeds: [
+          BotEmbed.error(
+            'Acesso Restrito',
+            'Esta lista é privada. Apenas o criador pode adicionar itens.',
+          ),
+        ],
         ephemeral: true,
       });
       return;
@@ -108,7 +112,9 @@ export const notepadToggleButton: IButtonHandler = {
 
     if (!allowed) {
       await ctx.interaction.reply({
-        embeds: [BotEmbed.error('Acesso Restrito', 'Apenas o criador pode alterar o status dos itens.')],
+        embeds: [
+          BotEmbed.error('Acesso Restrito', 'Apenas o criador pode alterar o status dos itens.'),
+        ],
         ephemeral: true,
       });
       return;
@@ -164,7 +170,9 @@ export const notepadEditButton: IButtonHandler = {
 
     if (!allowed) {
       await ctx.interaction.reply({
-        embeds: [BotEmbed.error('Acesso Restrito', 'Apenas o criador pode editar itens desta lista.')],
+        embeds: [
+          BotEmbed.error('Acesso Restrito', 'Apenas o criador pode editar itens desta lista.'),
+        ],
         ephemeral: true,
       });
       return;
@@ -219,7 +227,9 @@ export const notepadDeleteItemButton: IButtonHandler = {
 
     if (!allowed) {
       await ctx.interaction.reply({
-        embeds: [BotEmbed.error('Acesso Restrito', 'Apenas o criador pode remover itens desta lista.')],
+        embeds: [
+          BotEmbed.error('Acesso Restrito', 'Apenas o criador pode remover itens desta lista.'),
+        ],
         ephemeral: true,
       });
       return;
@@ -285,7 +295,12 @@ export const notepadClearDoneButton: IButtonHandler = {
     await service.refreshListMessage(listId, ctx.interaction.channel as TextChannel);
 
     await ctx.interaction.reply({
-      embeds: [BotEmbed.success('Itens Limpos', `${count} item(ns) concluído(s) foram removidos da lista.`)],
+      embeds: [
+        BotEmbed.success(
+          'Itens Limpos',
+          `${count} item(ns) concluído(s) foram removidos da lista.`,
+        ),
+      ],
       ephemeral: true,
     });
   },
@@ -310,7 +325,12 @@ export const notepadCustomizeButton: IButtonHandler = {
 
     if (!allowed) {
       await ctx.interaction.reply({
-        embeds: [BotEmbed.error('Acesso Negado', 'Apenas o dono da lista ou administradores podem personalizar as opções da lista.')],
+        embeds: [
+          BotEmbed.error(
+            'Acesso Negado',
+            'Apenas o dono da lista ou administradores podem personalizar as opções da lista.',
+          ),
+        ],
         ephemeral: true,
       });
       return;
@@ -373,7 +393,12 @@ export const notepadToggleModeButton: IButtonHandler = {
 
     if (!allowed) {
       await ctx.interaction.reply({
-        embeds: [BotEmbed.error('Acesso Negado', 'Apenas o dono da lista pode alterar as permissões de colaboração.')],
+        embeds: [
+          BotEmbed.error(
+            'Acesso Negado',
+            'Apenas o dono da lista pode alterar as permissões de colaboração.',
+          ),
+        ],
         ephemeral: true,
       });
       return;
@@ -418,7 +443,12 @@ export const notepadDeleteListButton: IButtonHandler = {
 
     if (!allowed) {
       await ctx.interaction.reply({
-        embeds: [BotEmbed.error('Acesso Negado', 'Apenas o dono da lista ou um administrador pode apagar este bloco.')],
+        embeds: [
+          BotEmbed.error(
+            'Acesso Negado',
+            'Apenas o dono da lista ou um administrador pode apagar este bloco.',
+          ),
+        ],
         ephemeral: true,
       });
       return;
@@ -428,7 +458,9 @@ export const notepadDeleteListButton: IButtonHandler = {
     await ctx.interaction.message.delete().catch(() => null);
 
     await ctx.interaction.reply({
-      embeds: [BotEmbed.success('Bloco Excluído', `A lista "${list.title}" foi excluída com sucesso.`)],
+      embeds: [
+        BotEmbed.success('Bloco Excluído', `A lista "${list.title}" foi excluída com sucesso.`),
+      ],
       ephemeral: true,
     });
   },
@@ -492,7 +524,9 @@ export const notepadEditModalHandler: IModalHandler = {
     await service.refreshListMessage(listId, ctx.interaction.channel as TextChannel);
 
     await ctx.interaction.reply({
-      embeds: [BotEmbed.success('Item Atualizado', 'O conteúdo do item foi modificado com sucesso.')],
+      embeds: [
+        BotEmbed.success('Item Atualizado', 'O conteúdo do item foi modificado com sucesso.'),
+      ],
       ephemeral: true,
     });
   },
@@ -529,7 +563,9 @@ export const notepadCustomizeModalHandler: IModalHandler = {
     await service.refreshListMessage(listId, ctx.interaction.channel as TextChannel);
 
     await ctx.interaction.reply({
-      embeds: [BotEmbed.success('Bloco Personalizado', 'As informações da lista foram atualizadas!')],
+      embeds: [
+        BotEmbed.success('Bloco Personalizado', 'As informações da lista foram atualizadas!'),
+      ],
       ephemeral: true,
     });
   },

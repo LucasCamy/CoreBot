@@ -129,7 +129,8 @@ export const voiceNotifyCommand: ICommand = {
     if (subcommand === 'adicionar') {
       const voiceChannel = interaction.options.getChannel('canal_voz', true);
       const textChannel = interaction.options.getChannel('canal_texto', true);
-      const eventType = (interaction.options.getString('tipo_evento') || 'ALL') as VoiceRuleEventType;
+      const eventType = (interaction.options.getString('tipo_evento') ||
+        'ALL') as VoiceRuleEventType;
       const joinMsg = interaction.options.getString('msg_entrada');
       const leaveMsg = interaction.options.getString('msg_saida');
       const moveMsg = interaction.options.getString('msg_troca');
@@ -217,8 +218,10 @@ export const voiceNotifyCommand: ICommand = {
                   ? '🔀 Troca'
                   : '🟢 Todos';
 
-          return `**${idx + 1}. [${typeIcon}]** <#${c.voiceChannelId}> ➡️ <#${c.targetChannelId}>\n` +
-            `└ ID: \`${c.id}\` | Status: ${c.enabled ? '🟢 Ativo' : '🔴 Inativo'} | Cooldown: ${c.cooldownSeconds}s`;
+          return (
+            `**${idx + 1}. [${typeIcon}]** <#${c.voiceChannelId}> ➡️ <#${c.targetChannelId}>\n` +
+            `└ ID: \`${c.id}\` | Status: ${c.enabled ? '🟢 Ativo' : '🔴 Inativo'} | Cooldown: ${c.cooldownSeconds}s`
+          );
         })
         .join('\n\n');
 

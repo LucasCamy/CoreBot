@@ -118,11 +118,7 @@ export class NotepadRepository {
     });
   }
 
-  public async addItem(
-    listId: string,
-    content: string,
-    userId: string,
-  ): Promise<NotepadItem> {
+  public async addItem(listId: string, content: string, userId: string): Promise<NotepadItem> {
     const count = await this.prisma.notepadItem.count({
       where: { listId },
     });
@@ -143,10 +139,7 @@ export class NotepadRepository {
     });
   }
 
-  public async toggleItem(
-    itemId: string,
-    completedByUserId: string,
-  ): Promise<NotepadItem | null> {
+  public async toggleItem(itemId: string, completedByUserId: string): Promise<NotepadItem | null> {
     const item = await this.findItemById(itemId);
     if (!item) return null;
 
@@ -161,10 +154,7 @@ export class NotepadRepository {
     });
   }
 
-  public async updateItemContent(
-    itemId: string,
-    content: string,
-  ): Promise<NotepadItem | null> {
+  public async updateItemContent(itemId: string, content: string): Promise<NotepadItem | null> {
     return this.prisma.notepadItem.update({
       where: { id: itemId },
       data: { content },

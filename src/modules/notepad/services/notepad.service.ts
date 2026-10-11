@@ -41,7 +41,9 @@ export class NotepadService {
     descriptionLines.push(modeBadge);
 
     if (totalItems > 0) {
-      descriptionLines.push(`📊 **Progresso:** [${progressBar}] **${percent}%** (${completedItems}/${totalItems})\n`);
+      descriptionLines.push(
+        `📊 **Progresso:** [${progressBar}] **${percent}%** (${completedItems}/${totalItems})\n`,
+      );
     } else {
       descriptionLines.push('📊 **Progresso:** [⬜⬜⬜⬜⬜⬜⬜⬜⬜⬜] **0%** (0 itens)\n');
     }
@@ -49,7 +51,9 @@ export class NotepadService {
     descriptionLines.push('──────────────────────────────');
 
     if (totalItems === 0) {
-      descriptionLines.push('\n*Nenhum item na lista ainda. Clique em "➕ Adicionar" abaixo para começar!*');
+      descriptionLines.push(
+        '\n*Nenhum item na lista ainda. Clique em "➕ Adicionar" abaixo para começar!*',
+      );
     } else {
       // Display up to 25 items cleanly
       const displayItems = list.items.slice(0, 25);
@@ -140,17 +144,16 @@ export class NotepadService {
   /**
    * Refreshes the list message in Discord channel
    */
-  public async refreshListMessage(
-    listId: string,
-    channel?: TextChannel,
-  ): Promise<boolean> {
+  public async refreshListMessage(listId: string, channel?: TextChannel): Promise<boolean> {
     try {
       const list = await this.container.notepadRepository.findById(listId);
       if (!list || !list.messageId) return false;
 
       let targetChannel = channel;
       if (!targetChannel) {
-        const fetched = await this.container.client.channels.fetch(list.channelId).catch(() => null);
+        const fetched = await this.container.client.channels
+          .fetch(list.channelId)
+          .catch(() => null);
         if (fetched && fetched.isTextBased() && 'messages' in fetched) {
           targetChannel = fetched as TextChannel;
         }
