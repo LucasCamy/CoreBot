@@ -156,6 +156,6 @@ async function bootstrap(): Promise<void> {
 }
 
 bootstrap().catch((error) => {
-  logger.fatal({ error }, 'Fatal error during CoreBot startup bootstrap');
+  logger.fatal({ err: error, message: error?.message, stack: error?.stack }, `Fatal error during CoreBot startup bootstrap: ${error?.message}`);
   process.exit(1);
 });
