@@ -29,6 +29,7 @@ import { TribunalModule } from './modules/tribunal/index.js';
 import { SoundboardModule } from './modules/soundboard/index.js';
 import { SocialAnalyticsModule } from './modules/social-analytics/index.js';
 import { StreamNotifierModule } from './modules/stream-notifier/index.js';
+import { NotepadModule } from './modules/notepad/index.js';
 
 async function bootstrap(): Promise<void> {
   logger.info('====================================================');
@@ -63,6 +64,7 @@ async function bootstrap(): Promise<void> {
   moduleRegistry.register(SoundboardModule);
   moduleRegistry.register(SocialAnalyticsModule);
   moduleRegistry.register(StreamNotifierModule);
+  moduleRegistry.register(NotepadModule);
 
   // 4. Initialize Modules, Commands, Handlers & Schedulers
   await moduleRegistry.initAll();

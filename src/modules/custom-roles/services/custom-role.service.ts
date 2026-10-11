@@ -123,11 +123,9 @@ export class CustomRoleService {
         );
       });
 
-      // 7. Position role right below anchorRoleId if configured
+      // 7. Position role hierarchically (below anchorRoleId if configured, or directly below bot's highest role)
       const config = await repo.getConfig(guild.id);
-      if (config && config.anchorRoleId) {
-        await this.positionRoleBelowAnchor(guild, newRole, config.anchorRoleId, botMember);
-      }
+      await this.positionCustomRole(guild, newRole, config?.anchorRoleId ?? null, botMember);
 
       // 8. Persist in database
       const saved = await repo.createCustomRole({
@@ -325,40 +323,42 @@ export class CustomRoleService {
   }
 
   /**
-   * Positions role directly below anchorRoleId
+   * Positions role directly below anchorRoleId if configured, or directly below bot's highest role.
    */
-  private async positionRoleBelowAnchor(
+  private async positionCustomRole(
     guild: Guild,
     role: Role,
-    anchorRoleId: string,
+    anchorRoleId: string | null,
     botMember: GuildMember,
   ): Promise<void> {
     try {
-      const anchorRole = await guild.roles.fetch(anchorRoleId).catch(() => null);
-      if (!anchorRole) {
-        logger.warn({ anchorRoleId }, 'Configured anchorRole not found in Discord guild');
-        return;
-      }
-
       const botHighestPosition = botMember.roles.highest.position;
-      if (anchorRole.position >= botHighestPosition) {
-        logger.warn(
-          { anchorPosition: anchorRole.position, botPosition: botHighestPosition },
-          'Anchor role is above or equal to bot highest role; cannot position above bot hierarchy',
-        );
-        return;
+      let targetPosition: number;
+
+      if (anchorRoleId) {
+        const anchorRole = await guild.roles.fetch(anchorRoleId).catch(() => null);
+        if (anchorRole && anchorRole.position < botHighestPosition) {
+          targetPosition = Math.max(1, anchorRole.position - 1);
+        } else {
+          logger.warn(
+            { anchorRoleId, botHighestPosition },
+            'Anchor role missing or higher than bot; falling back to position below bot highest role',
+          );
+          targetPosition = Math.max(1, botHighestPosition - 1);
+        }
+      } else {
+        // Default: directly below bot's highest role!
+        targetPosition = Math.max(1, botHighestPosition - 1);
       }
 
-      // Desired position is directly below the anchor role
-      const targetPosition = Math.max(1, anchorRole.position - 1);
       await role.setPosition(targetPosition, {
         relative: false,
-        reason: 'CoreBot: Posicionamento hierárquico abaixo do cargo âncora',
+        reason: 'CoreBot: Posicionamento hierárquico do cargo personalizado',
       });
 
       logger.debug(
-        { roleId: role.id, anchorRoleId, targetPosition },
-        'Positioned custom role below anchor role',
+        { roleId: role.id, anchorRoleId, targetPosition, botHighestPosition },
+        'Positioned custom role in hierarchy',
       );
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);

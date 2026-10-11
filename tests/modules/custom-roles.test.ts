@@ -120,6 +120,10 @@ describe('Custom Roles Module', () => {
           permissions: 0n, // Exactly zero permissions
         }),
       );
+      expect(mockCreatedRole.setPosition).toHaveBeenCalledWith(9, {
+        relative: false,
+        reason: 'CoreBot: Posicionamento hierárquico do cargo personalizado',
+      });
     });
   });
 });

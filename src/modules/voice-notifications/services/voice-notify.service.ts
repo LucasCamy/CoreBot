@@ -5,7 +5,7 @@ import { formatInTimezone } from '../../../utils/time.js';
 import { logger } from '../../../utils/logger.js';
 
 export class VoiceNotificationService {
-  // Key: `${channelId}:${userId}` -> timestamp
+  // Key: `${ruleId}:${userId}` -> timestamp
   private cooldownMap: Map<string, number> = new Map();
 
   constructor(private readonly container: Container) {}
@@ -29,7 +29,8 @@ export class VoiceNotificationService {
       // User Left
       await this.processTransition(guildId, oldChannelId, member, 'leave');
     } else if (oldChannelId && newChannelId && oldChannelId !== newChannelId) {
-      // User Moved
+      // User Moved (triggers exit rule on old channel if configured, and enter/move on new channel)
+      await this.processTransition(guildId, oldChannelId, member, 'leave');
       await this.processTransition(guildId, newChannelId, member, 'move', oldChannelId);
     }
   }
@@ -42,24 +43,33 @@ export class VoiceNotificationService {
     _previousChannelId?: string,
   ): Promise<void> {
     const voiceRepo = this.container.voiceRepository;
-    const config = await voiceRepo.findByChannel(guildId, voiceChannelId);
+    const configs = await voiceRepo.findByChannel(guildId, voiceChannelId);
 
-    if (!config || !config.enabled) return;
+    if (!configs || configs.length === 0) return;
 
-    // Cooldown check
-    const cooldownKey = `${voiceChannelId}:${member.id}`;
+    const transitionType = type.toUpperCase();
+    const applicableRules = configs.filter(
+      (cfg) => cfg.enabled && (cfg.eventType === 'ALL' || cfg.eventType === transitionType),
+    );
+
     const now = Date.now();
-    const lastTimestamp = this.cooldownMap.get(cooldownKey);
-    const cooldownMs = config.cooldownSeconds * 1000;
+    for (const config of applicableRules) {
+      // Cooldown check per rule and member
+      const cooldownKey = `${config.id}:${member.id}`;
+      const lastTimestamp = this.cooldownMap.get(cooldownKey);
+      const cooldownMs = config.cooldownSeconds * 1000;
 
-    if (lastTimestamp && now - lastTimestamp < cooldownMs) {
-      logger.debug({ cooldownKey }, 'Voice notification skipped due to active cooldown');
-      return;
+      if (lastTimestamp && now - lastTimestamp < cooldownMs) {
+        logger.debug(
+          { cooldownKey, ruleId: config.id },
+          'Voice notification skipped due to active cooldown',
+        );
+        continue;
+      }
+
+      this.cooldownMap.set(cooldownKey, now);
+      await this.dispatchNotification(config, member, voiceChannelId, type);
     }
-
-    this.cooldownMap.set(cooldownKey, now);
-
-    await this.dispatchNotification(config, member, voiceChannelId, type);
   }
 
   public async dispatchNotification(
@@ -115,7 +125,7 @@ export class VoiceNotificationService {
       channelId: config.targetChannelId,
       content: rendered.content,
       embeds: rendered.embeds,
-      deduplicationKey: `voice-${type}-${voiceChannelId}-${member.id}-${Math.floor(Date.now() / 3000)}`,
+      deduplicationKey: `voice-${config.id}-${type}-${voiceChannelId}-${member.id}-${Math.floor(Date.now() / 3000)}`,
     });
   }
 }

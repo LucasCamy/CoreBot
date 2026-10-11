@@ -1,9 +1,12 @@
 import { z } from 'zod';
 
+export const voiceRuleEventTypeSchema = z.enum(['ALL', 'JOIN', 'LEAVE', 'MOVE']);
+
 export const voiceConfigSchema = z.object({
   guildId: z.string().min(1),
   voiceChannelId: z.string().min(1),
   targetChannelId: z.string().min(1),
+  eventType: voiceRuleEventTypeSchema.default('ALL'),
   enabled: z.boolean().default(true),
   joinMessage: z.string().min(1).default('👋 {userMention} entrou no canal {channelMention}!'),
   leaveMessage: z.string().min(1).default('🚪 {userMention} saiu do canal {channelMention}.'),
@@ -22,3 +25,4 @@ export const voiceConfigSchema = z.object({
 });
 
 export type VoiceConfigInput = z.infer<typeof voiceConfigSchema>;
+export type VoiceRuleEventType = z.infer<typeof voiceRuleEventTypeSchema>;
