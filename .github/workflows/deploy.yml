@@ -13,8 +13,6 @@ jobs:
   build-and-push:
     name: Build & Push Container Image
     runs-on: ubuntu-latest
-    env:
-      KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
 
     steps:
       - name: Checkout repository
@@ -42,15 +40,25 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+  deploy-to-k8s:
+    name: Deploy to Kubernetes via Tailscale
+    needs:
+      - build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Conectar à rede Tailscale
+        uses: tailscale/github-action@v2
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+
       - name: Configurar Kubeconfig
-        if: env.KUBE_CONFIG != ''
         uses: azure/k8s-set-context@v4
         with:
           method: kubeconfig
           kubeconfig: ${{ secrets.KUBE_CONFIG }}
 
       - name: Atualizar Deployment no Kubernetes
-        if: env.KUBE_CONFIG != ''
         run: |
-          kubectl set image deployment/corebot corebot=ghcr.io/lucascamy/corebot:${{ github.sha }}
-          kubectl rollout status deployment/corebot --timeout=120s
+          REPO_OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          kubectl set image deployment/corebot-app -n corebot corebot=ghcr.io/${REPO_OWNER}/corebot:${{ github.sha }}
+          kubectl rollout status deployment/corebot-app -n corebot --timeout=120s
