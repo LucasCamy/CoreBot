@@ -13,6 +13,8 @@ jobs:
   build-and-push:
     name: Build & Push Container Image
     runs-on: ubuntu-latest
+    env:
+      KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
 
     steps:
       - name: Checkout repository
@@ -41,14 +43,14 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Configurar Kubeconfig
-        if: ${{ secrets.KUBE_CONFIG != '' }}
+        if: env.KUBE_CONFIG != ''
         uses: azure/k8s-set-context@v4
         with:
           method: kubeconfig
           kubeconfig: ${{ secrets.KUBE_CONFIG }}
 
       - name: Atualizar Deployment no Kubernetes
-        if: ${{ secrets.KUBE_CONFIG != '' }}
+        if: env.KUBE_CONFIG != ''
         run: |
           kubectl set image deployment/corebot corebot=ghcr.io/lucascamy/corebot:${{ github.sha }}
           kubectl rollout status deployment/corebot --timeout=120s
