@@ -50,6 +50,7 @@ COPY --from=builder --chown=corebot:corebot /app/node_modules ./node_modules
 COPY --from=builder --chown=corebot:corebot /app/dist ./dist
 COPY --from=builder --chown=corebot:corebot /app/prisma ./prisma
 COPY --chown=corebot:corebot assets ./assets
+COPY --chown=corebot:corebot public ./public
 COPY --chown=corebot:corebot docker-entrypoint.sh ./docker-entrypoint.sh
 
 # Ensure non-root ownership on copied assets and runtime directories

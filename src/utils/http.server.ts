@@ -1,5 +1,8 @@
 import Fastify, { FastifyInstance } from 'fastify';
 import fastifyBasicAuth from '@fastify/basic-auth';
+import fastifyStatic from '@fastify/static';
+import path from 'node:path';
+import fs from 'node:fs';
 import { createBullBoard } from '@bull-board/api';
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
 import { FastifyAdapter } from '@bull-board/fastify';
@@ -139,6 +142,28 @@ export async function startHttpServer(container: Container): Promise<FastifyInst
       reply.status(500).send({ error: 'Internal Server Error', message: msg });
     }
   });
+
+  // 6. Static Web Hosting (Landing Page, Terms of Service, Privacy Policy)
+  const publicDir = fs.existsSync(path.resolve(process.cwd(), 'public'))
+    ? path.resolve(process.cwd(), 'public')
+    : path.resolve(process.cwd(), 'docs');
+
+  if (fs.existsSync(publicDir)) {
+    await app.register(fastifyStatic, {
+      root: publicDir,
+      prefix: '/',
+    });
+
+    app.get('/terms', async (_req, reply) => {
+      return reply.sendFile('terms.html');
+    });
+
+    app.get('/privacy', async (_req, reply) => {
+      return reply.sendFile('privacy.html');
+    });
+
+    logger.info(`Static landing & legal pages mounted from ${publicDir}`);
+  }
 
   // Start listening
   await app.listen({ port: env.PORT, host: '0.0.0.0' });

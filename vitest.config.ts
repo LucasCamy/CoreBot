@@ -5,6 +5,18 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    env: {
+      BOT_TOKEN: 'mock-bot-token-for-tests',
+      DISCORD_CLIENT_ID: '123456789012345678',
+      DISCORD_ALLOWED_GUILD_IDS: '123456789012345678',
+      DATABASE_URL: 'postgresql://mock:mock@localhost:5432/mock',
+      REDIS_HOST: 'localhost',
+      REDIS_PORT: '6379',
+      PORT: '3000',
+      ADMIN_DASHBOARD_USER: 'admin',
+      ADMIN_DASHBOARD_PASS: 'admin123',
+      WEBHOOK_SECRET: 'test-secret',
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
