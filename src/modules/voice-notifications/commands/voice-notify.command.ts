@@ -209,12 +209,13 @@ export const voiceNotifyCommand: ICommand = {
 
       const desc = configs
         .map((c, idx) => {
+          const eventType = (c.eventType || 'ALL').toUpperCase();
           const typeIcon =
-            c.eventType === 'JOIN'
+            eventType === 'JOIN'
               ? '👋 Entrada'
-              : c.eventType === 'LEAVE'
+              : eventType === 'LEAVE'
                 ? '🚪 Saída'
-                : c.eventType === 'MOVE'
+                : eventType === 'MOVE'
                   ? '🔀 Troca'
                   : '🟢 Todos';
 
@@ -225,11 +226,12 @@ export const voiceNotifyCommand: ICommand = {
         })
         .join('\n\n');
 
+      const channelTitle = filterChannel ? filterChannel.name : null;
       await interaction.reply({
         embeds: [
           BotEmbed.info(
-            filterChannel
-              ? `Regras de Notificação: #${filterChannel.name}`
+            channelTitle
+              ? `Regras de Notificação: #${channelTitle}`
               : 'Regras de Notificação de Voz Ativas',
             desc.slice(0, 4000),
           ),
