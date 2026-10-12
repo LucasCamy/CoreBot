@@ -3,23 +3,28 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Termos de Serviço | Uganda Knuckles</title>
+<title>Termos de Serviço • Uganda Knuckles</title>
 <meta name="description" content="Termos de Serviço do bot Uganda Knuckles para Discord.">
-<meta name="theme-color" content="#111111">
+<meta name="theme-color" content="#070404">
 <link rel="icon" href="img/avatar.webp" type="image/webp">
 <link rel="preload" href="fonts/Bangers-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header class="nav">
   <div class="wrap">
-    <a class="brand" href="index.html"><img src="img/avatar.webp" alt="" width="38" height="38">Uganda Knuckles</a>
+    <a class="brand" href="index.html">
+      <img class="brand-avatar" src="img/avatar.webp" alt="Uganda Knuckles" width="44" height="44">
+      <span class="brand-text">Uganda <span>Knuckles</span></span>
+    </a>
     <nav aria-label="Principal">
       <ul>
         <li><a href="index.html">Início</a></li>
-        <li><a href="terms.html" aria-current="page">Termos de Serviço</a></li>
+        <li><a href="terms.html" aria-current="page">Termos</a></li>
         <li><a href="privacy.html">Privacidade</a></li>
+        <li><a class="nav-cta" href="https://discord.com/oauth2/authorize?client_id=1087488079020949659&amp;permissions=422693904&amp;scope=bot%20applications.commands"><i class="ph-bold ph-plus-circle" aria-hidden="true"></i>Adicionar</a></li>
       </ul>
     </nav>
   </div>
@@ -40,7 +45,7 @@
       <li><a href="#uso">2. Uso aceitável</a></li>
       <li><a href="#permissoes">3. Permissões</a></li>
       <li><a href="#conteudo">4. Conteúdo</a></li>
-      <li><a href="#tribunal">5. Recursos de brincadeira</a></li>
+      <li><a href="#tribunal">5. Recursos de zoeira</a></li>
       <li><a href="#disponibilidade">6. Disponibilidade</a></li>
       <li><a href="#suspensao">7. Suspensão</a></li>
       <li><a href="#responsabilidade">8. Responsabilidade</a></li>
@@ -54,65 +59,90 @@
     <div class="summary">
       <b>Em resumo</b>
       <ul>
-        <li>O bot é gratuito e fornecido como está.</li>
-        <li>Use com bom senso e respeite as regras do Discord.</li>
-        <li>Quem administra o servidor responde pela configuração e pelo conteúdo.</li>
-        <li>Podemos suspender quem abusar do serviço.</li>
+        <li>O bot é fornecido gratuitamente como está ("as is").</li>
+        <li>Use com responsabilidade e respeite as diretrizes oficiais do Discord.</li>
+        <li>Quem administra o servidor responde pela configuração e pelo conteúdo cadastrado.</li>
+        <li>Reservamo-nos o direito de suspender o acesso em caso de abuso ou spam.</li>
       </ul>
     </div>
 
-    <p>Ao adicionar o Uganda Knuckles ("Bot") a um servidor do Discord ou usar seus comandos, você concorda com estes Termos. Se não concordar, remova o Bot do servidor e deixe de usá-lo.</p>
+    <section id="servico">
+      <h2>1. O serviço</h2>
+      <p>O <strong>Uganda Knuckles</strong> é uma aplicação independente desenvolvida para a plataforma Discord. Seu propósito é oferecer automação de canais de voz dinâmicos, organização de lobbies de jogos, enquetes de entretenimento ("tribunal"), catálogo de frases célebres ("pérolas"), reprodução de áudios ("soundboard"), agendamento de eventos e listas de presença.</p>
+      <p>Ao adicionar o bot ao seu servidor ou interagir com seus comandos, você concorda com estes Termos de Serviço.</p>
+    </section>
 
-    <h2 id="servico">1. O serviço</h2>
-    <p>O Bot oferece ferramentas de organização e entretenimento para servidores do Discord: salas de voz dinâmicas, notificações de voz, lobbies de jogos, agenda, listas de presença, bloco de notas, aniversários, contagens regressivas, citações, clipes, cargos personalizados, soundboard, monitoramento de servidores de jogos e avisos de lives. O serviço é gratuito e fornecido no estado em que se encontra.</p>
+    <section id="uso">
+      <h2>2. Uso aceitável</h2>
+      <p>Você concorda em utilizar o bot apenas para fins lícitos e recreativos, comprometendo-se a <strong>não</strong>:</p>
+      <ul>
+        <li>Explorar falhas, bugs ou vulnerabilidades para sobrecarregar a infraestrutura do bot ou do Discord;</li>
+        <li>Utilizar comandos repetidamente para gerar spam em canais de texto ou voz;</li>
+        <li>Cadastrar conteúdos com apologia ao crime, discurso de ódio, assédio, pornografia ou violação de direitos autorais;</li>
+        <li>Violar os <a href="https://discord.com/terms" target="_blank" rel="noopener">Termos de Serviço do Discord</a> e suas <a href="https://discord.com/guidelines" target="_blank" rel="noopener">Diretrizes da Comunidade</a>.</li>
+      </ul>
+    </section>
 
-    <h2 id="uso">2. Uso aceitável</h2>
-    <ul>
-      <li>Cumpra os <a href="https://discord.com/terms">Termos de Serviço do Discord</a> e as <a href="https://discord.com/guidelines">Diretrizes da Comunidade</a>.</li>
-      <li>Não use o Bot para assédio, discriminação, spam, conteúdo ilegal ou qualquer atividade que prejudique pessoas ou o serviço.</li>
-      <li>Não tente burlar limites, acessar áreas restritas ou sobrecarregar o Bot de propósito.</li>
-      <li>Administradores são responsáveis por configurar o Bot e pelo que seus membros criam com ele.</li>
-    </ul>
+    <section id="permissoes">
+      <h2>3. Permissões requeridas</h2>
+      <p>Para executar suas funções, o bot solicita permissões específicas (como criar canais temporários, mover membros em voz e enviar mensagens). Os administradores do servidor têm a faculdade de revogar ou limitar essas permissões a qualquer momento pelas configurações do Discord, cientes de que recursos dependentes dessas permissões deixarão de funcionar.</p>
+    </section>
 
-    <h2 id="permissoes">3. Permissões</h2>
-    <p>O Bot solicita no Discord apenas as permissões necessárias para seus recursos, descritas na <a href="index.html#permissoes">página inicial</a>. Administradores podem revogá-las a qualquer momento, o que pode desativar funcionalidades.</p>
+    <section id="conteudo">
+      <h2>4. Conteúdo gerado pelos usuários</h2>
+      <p>Frases cadastradas em pérolas, títulos de eventos, anotações de bloco e itens de lista são de responsabilidade exclusiva dos membros e administradores do servidor que os criaram. O mantenedor do bot não modera ativamente o conteúdo interno dos servidores, mas pode remover dados ou desativar o bot em servidores denunciados por violações graves.</p>
+    </section>
 
-    <h2 id="conteudo">4. Conteúdo dos usuários</h2>
-    <p>Você mantém a titularidade do que informa ao Bot (títulos, descrições, citações, links e afins) e nos concede permissão limitada para armazenar e exibir esse conteúdo no servidor, apenas para operar o serviço. Você declara ter o direito de compartilhá-lo.</p>
+    <section id="tribunal">
+      <h2>5. Recursos de zoeira ("Tribunal")</h2>
+      <p>O módulo de tribunal permite votação popular entre membros para alteração temporária do apelido do participante julgado. Esse recurso destina-se estritamente à descontração consensual entre amigos. O bot não se responsabiliza por desentendimentos decorrentes do uso da funcionalidade.</p>
+    </section>
 
-    <h2 id="tribunal">5. Recursos de brincadeira</h2>
-    <p>Recursos como o Tribunal (que altera temporariamente o apelido de um membro após votação) e as Pérolas (que guardam frases ditas no servidor) existem para diversão entre amigos. Administradores devem usá-los apenas em comunidades em que os membros concordam com a brincadeira e podem desativá-los quando quiserem.</p>
+    <section id="disponibilidade">
+      <h2>6. Disponibilidade</h2>
+      <p>O serviço é mantido sem garantias de disponibilidade ininterrupta (uptime de 100%). Janelas de manutenção, reinicializações e indisponibilidades imprevistas podem ocorrer a qualquer momento sem aviso prévio.</p>
+    </section>
 
-    <h2 id="disponibilidade">6. Disponibilidade e alterações do serviço</h2>
-    <p>Não garantimos funcionamento ininterrupto. Podemos modificar, suspender ou encerrar o Bot, ou recursos específicos, a qualquer momento, com ou sem aviso.</p>
+    <section id="suspensao">
+      <h2>7. Suspensão e encerramento</h2>
+      <p>O mantenedor reserva-se o direito de bloquear servidores ou usuários específicos que violem estes termos, sem necessidade de aviso prévio ou indenização.</p>
+    </section>
 
-    <h2 id="suspensao">7. Suspensão</h2>
-    <p>Podemos restringir ou bloquear usuários e servidores que violem estes Termos ou coloquem o serviço em risco.</p>
+    <section id="responsabilidade">
+      <h2>8. Limitação de responsabilidade</h2>
+      <p>Na máxima extensão permitida pela lei aplicável, o desenvolvedor não responderá por danos diretos, indiretos, incidentais ou consequentes decorrentes do uso ou da impossibilidade de uso do bot.</p>
+    </section>
 
-    <h2 id="responsabilidade">8. Isenção de garantias e limitação de responsabilidade</h2>
-    <p>O Bot é fornecido "como está", sem garantias de qualquer natureza. Na máxima extensão permitida pela lei, o responsável pelo Bot não responde por danos indiretos, perda de dados, interrupções ou prejuízos decorrentes do uso ou da impossibilidade de uso do serviço.</p>
+    <section id="privacidade">
+      <h2>9. Privacidade</h2>
+      <p>O tratamento de dados operacionais e de identificação pública é regido por nossa <a href="privacy.html">Política de Privacidade</a>, parte integrante destes termos.</p>
+    </section>
 
-    <h2 id="privacidade">9. Privacidade</h2>
-    <p>O tratamento de dados está descrito na <a href="privacy.html">Política de Privacidade</a>, que faz parte destes Termos.</p>
+    <section id="alteracoes">
+      <h2>10. Alterações destes termos</h2>
+      <p>Estes termos podem ser atualizados periodicamente. Recomendamos a consulta regular desta página. O uso continuado do bot após alterações constitui aceitação dos novos termos.</p>
+    </section>
 
-    <h2 id="alteracoes">10. Alterações destes Termos</h2>
-    <p>Podemos atualizar estes Termos periodicamente. A data no topo indica a versão vigente, e o uso continuado do Bot depois de uma mudança representa aceitação.</p>
-
-    <h2 id="contato">11. Lei aplicável e contato</h2>
-    <p>Estes Termos são regidos pelas leis da República Federativa do Brasil. Dúvidas ou solicitações: <a href="mailto:lucascamy@hotmail.com">lucascamy@hotmail.com</a>.</p>
+    <section id="contato">
+      <h2>11. Lei aplicável e contato</h2>
+      <p>Estes termos são regidos pelas leis da República Federativa do Brasil. Dúvidas ou solicitações devem ser encaminhadas ao e-mail <a href="mailto:lucascamy@hotmail.com">lucascamy@hotmail.com</a>.</p>
+    </section>
   </article>
 </div>
 
 <footer>
   <div class="wrap">
-    <a class="brand" href="index.html"><img src="img/avatar.webp" alt="" width="38" height="38">Uganda Knuckles</a>
+    <a class="brand" href="index.html">
+      <img class="brand-avatar" src="img/avatar.webp" alt="Uganda Knuckles" width="38" height="38">
+      <span>Uganda Knuckles</span>
+    </a>
     <nav aria-label="Rodapé">
       <a href="terms.html">Termos de Serviço</a>
       <a href="privacy.html">Política de Privacidade</a>
       <a href="mailto:lucascamy@hotmail.com">Contato</a>
       <a href="https://github.com/LucasCamy/CoreBot">GitHub</a>
     </nav>
-    <p class="disc">Projeto independente, sem afiliação ao Discord Inc.</p>
+    <p class="disc">Projeto independente, sem afiliação direta ao Discord Inc.</p>
   </div>
 </footer>
 

@@ -3,23 +3,28 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Política de Privacidade | Uganda Knuckles</title>
+<title>Política de Privacidade • Uganda Knuckles</title>
 <meta name="description" content="Política de Privacidade do bot Uganda Knuckles para Discord: quais dados são coletados, por quanto tempo e como pedir a exclusão.">
-<meta name="theme-color" content="#111111">
+<meta name="theme-color" content="#070404">
 <link rel="icon" href="img/avatar.webp" type="image/webp">
 <link rel="preload" href="fonts/Bangers-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header class="nav">
   <div class="wrap">
-    <a class="brand" href="index.html"><img src="img/avatar.webp" alt="" width="38" height="38">Uganda Knuckles</a>
+    <a class="brand" href="index.html">
+      <img class="brand-avatar" src="img/avatar.webp" alt="Uganda Knuckles" width="44" height="44">
+      <span class="brand-text">Uganda <span>Knuckles</span></span>
+    </a>
     <nav aria-label="Principal">
       <ul>
         <li><a href="index.html">Início</a></li>
-        <li><a href="terms.html">Termos de Serviço</a></li>
+        <li><a href="terms.html">Termos</a></li>
         <li><a href="privacy.html" aria-current="page">Privacidade</a></li>
+        <li><a class="nav-cta" href="https://discord.com/oauth2/authorize?client_id=1087488079020949659&amp;permissions=422693904&amp;scope=bot%20applications.commands"><i class="ph-bold ph-plus-circle" aria-hidden="true"></i>Adicionar</a></li>
       </ul>
     </nav>
   </div>
@@ -53,71 +58,98 @@
     <div class="summary">
       <b>Em resumo</b>
       <ul>
-        <li>Guardamos IDs do Discord, configurações e o conteúdo que você mesmo cadastra.</li>
-        <li>Não lemos conversas nem gravamos áudio de voz.</li>
-        <li>Logs de notificação somem em 14 dias e o histórico de voz em 90 dias.</li>
-        <li>Você pode pedir acesso ou exclusão pelo e-mail de contato.</li>
+        <li>Armazenamos apenas identificadores públicos do Discord (IDs de servidor, canal e usuário) e preferências configuradas.</li>
+        <li>Não lemos conversas privadas de texto nem gravamos ou escutamos áudio nos canais de voz.</li>
+        <li>Logs operacionais expiram em 14 dias; históricos de voz expiram em 90 dias.</li>
+        <li>Você pode solicitar acesso, exportação ou exclusão definitiva a qualquer momento via e-mail.</li>
       </ul>
     </div>
 
-    <h2 id="responsavel">1. Quem somos</h2>
-    <p>O Uganda Knuckles ("Bot") é um projeto independente mantido por Lucas Camy, responsável pelo tratamento dos dados descritos aqui. Contato: <a href="mailto:lucascamy@hotmail.com">lucascamy@hotmail.com</a>.</p>
+    <section id="responsavel">
+      <h2>1. Quem somos</h2>
+      <p>O <strong>Uganda Knuckles</strong> é mantido como projeto independente por Lucas Camy (<a href="mailto:lucascamy@hotmail.com">lucascamy@hotmail.com</a>). O projeto não possui vínculo societário ou institucional com a Discord Inc.</p>
+    </section>
 
-    <h2 id="coleta">2. Dados que coletamos</h2>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Categoria</th><th>Exemplos</th><th>Finalidade</th></tr></thead>
-        <tbody>
-          <tr><td>Identificadores do Discord</td><td>IDs de servidor, canal, mensagem, cargo e usuário; nome de usuário em listas de presença e lobbies</td><td>Ligar configurações e registros ao servidor certo e exibir participantes</td></tr>
-          <tr><td>Configurações do servidor</td><td>Fuso horário, cargos administrativos, canais configurados, regras de notificação de voz, salas dinâmicas</td><td>Operar os módulos</td></tr>
-          <tr><td>Conteúdo fornecido por você</td><td>Títulos e descrições de eventos, itens do bloco de notas, citações salvas, links de clipes, nome e cor de cargos personalizados, datas de aniversário</td><td>Prestar os recursos solicitados</td></tr>
-          <tr><td>Atividade em voz</td><td>Horário de entrada e saída e duração em canais de voz</td><td>Notificações e estatísticas do servidor</td></tr>
-          <tr><td>Registros técnicos</td><td>Logs de notificações enviadas, erros e métricas operacionais</td><td>Diagnóstico e estabilidade</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p>O Bot <strong>não</strong> lê o conteúdo de mensagens comuns para análise, <strong>não</strong> grava nem armazena áudio dos canais de voz (apenas reproduz sons do soundboard) e <strong>não</strong> coleta e-mail, telefone ou dados de pagamento.</p>
+    <section id="coleta">
+      <h2>2. Dados que coletamos</h2>
+      <p>Para prover os serviços contratados pelo servidor, coletamos apenas os dados estritamente necessários:</p>
+      <ul>
+        <li><strong>Identificadores Discord:</strong> ID do servidor (Guild ID), ID de canais, ID de cargos e ID de usuários;</li>
+        <li><strong>Nomes públicos:</strong> Username e apelido do servidor (Server Nickname) quando vinculados a ações específicas (como presença em eventos, listas ou citações de pérolas);</li>
+        <li><strong>Configurações do servidor:</strong> Canais designados para notificações de voz, regras de eventos, fuso horário escolhido e permissões administrativas internas;</li>
+        <li><strong>Conteúdo voluntário:</strong> Títulos de eventos, frases cadastradas voluntariamente com <code>/perola</code> e itens de checklists coletivos;</li>
+        <li><strong>Logs de telemetria operacional:</strong> Registros técnicos temporários de disparo de avisos e transições de entrada/saída de canais de voz.</li>
+      </ul>
+      <p><strong>O que NÃO coletamos:</strong> Mensagens de texto comuns do chat, fotos privadas, mensagens diretas (DMs), nem fluxo de áudio dos canais de voz. O bot apenas transmite som sob demanda, sem qualquer funcionalidade de escuta ou gravação.</p>
+    </section>
 
-    <h2 id="uso">3. Como usamos os dados</h2>
-    <p>Exclusivamente para operar as funcionalidades do Bot. Não vendemos, alugamos nem compartilhamos dados para publicidade ou análise comercial.</p>
+    <section id="uso">
+      <h2>3. Finalidade do uso dos dados</h2>
+      <p>Os dados são processados exclusivamente para a execução das funcionalidades do bot:</p>
+      <ul>
+        <li>Criar, gerenciar e deletar canais dinâmicos temporários;</li>
+        <li>Disparar avisos configurados de entrada/saída de voz nos canais de destino;</li>
+        <li>Controlar presenças e confirmações em lobbies e listas de eventos;</li>
+        <li>Garantir a integridade do sistema contra spam e abuso de requisições.</li>
+      </ul>
+    </section>
 
-    <h2 id="retencao">4. Retenção</h2>
-    <ul>
-      <li>Registros de notificações: apagados automaticamente após <strong>14 dias</strong>.</li>
-      <li>Registros de atividade em voz: apagados automaticamente após <strong>90 dias</strong>.</li>
-      <li>Demais dados (eventos, listas, citações e afins): mantidos enquanto o Bot estiver no servidor ou até serem removidos pelo comando correspondente.</li>
-    </ul>
+    <section id="retencao">
+      <h2>4. Período de retenção</h2>
+      <p>Mantemos os dados somente pelo período indispensável para cada recurso:</p>
+      <ul>
+        <li><strong>Logs operacionais de notificação:</strong> Excluídos automaticamente após 14 dias;</li>
+        <li><strong>Logs de atividade de voz:</strong> Excluídos automaticamente após 90 dias;</li>
+        <li><strong>Configurações e dados estáticos (eventos, frases, notas):</strong> Armazenados enquanto o bot estiver presente no servidor ou até o comando explícito de remoção;</li>
+        <li><strong>Remoção do servidor:</strong> Caso o bot seja expulso de um servidor, as configurações associadas podem ser expurgadas da base de dados mediante solicitação ou ciclo de manutenção.</li>
+      </ul>
+    </section>
 
-    <h2 id="compartilhamento">5. Compartilhamento e armazenamento</h2>
-    <p>Os dados ficam em banco de dados próprio, com acesso restrito ao responsável pelo Bot. Provedores de infraestrutura (hospedagem) podem processá-los estritamente para manter o serviço no ar. Integrações opcionais, como a API da Twitch, recebem apenas o necessário, por exemplo o nome do canal monitorado. As informações também trafegam pelo Discord, sujeito à <a href="https://discord.com/privacy">Política de Privacidade do Discord</a>.</p>
+    <section id="compartilhamento">
+      <h2>5. Compartilhamento de dados</h2>
+      <p>Não comercializamos, alugamos nem repassamos dados de usuários a terceiros para fins de marketing ou publicidade. Os dados transitam apenas entre o cluster de execução do bot, o banco de dados PostgreSQL seguro e as APIs oficiais do Discord.</p>
+    </section>
 
-    <h2 id="direitos">6. Seus direitos</h2>
-    <p>Você pode pedir acesso, correção ou exclusão dos seus dados, inclusive nos termos da LGPD (Lei 13.709/2018), por e-mail, informando seu ID de usuário do Discord. Administradores podem pedir a exclusão completa dos dados do servidor. Remover o Bot do servidor também encerra a coleta.</p>
+    <section id="direitos">
+      <h2>6. Seus direitos (LGPD / GDPR)</h2>
+      <p>Você tem o direito de solicitar a confirmação da existência de tratamento, o acesso aos dados armazenados, a correção de dados incompletos e a eliminação dos seus dados da nossa base. Basta enviar um e-mail para <a href="mailto:lucascamy@hotmail.com">lucascamy@hotmail.com</a> informando seu Discord User ID.</p>
+    </section>
 
-    <h2 id="seguranca">7. Segurança</h2>
-    <p>Adotamos medidas técnicas razoáveis: acesso restrito, credenciais protegidas e comunicação criptografada. Nenhum sistema é totalmente imune a falhas, então não é possível garantir segurança absoluta.</p>
+    <section id="seguranca">
+      <h2>7. Segurança da informação</h2>
+      <p>Adotamos medidas técnicas de segurança, incluindo comunicação criptografada via HTTPS/WSS com o Discord, isolamento de banco de dados em rede privada (Kubernetes/k3s) e restrição de acesso por chaves seguras.</p>
+    </section>
 
-    <h2 id="menores">8. Menores de idade</h2>
-    <p>O Bot segue a idade mínima exigida pelo Discord e não é direcionado a crianças. Se identificarmos dados de menores coletados indevidamente, eles serão removidos.</p>
+    <section id="menores">
+      <h2>8. Menores de idade</h2>
+      <p>O bot segue a faixa etária mínima exigida pelos termos de uso do Discord (13 anos ou a idade legal exigida em seu país). Não coletamos conscientemente dados de crianças menores de 13 anos.</p>
+    </section>
 
-    <h2 id="alteracoes">9. Alterações desta política</h2>
-    <p>Esta política pode ser atualizada. A data no topo indica a versão vigente.</p>
+    <section id="alteracoes">
+      <h2>9. Atualizações desta política</h2>
+      <p>Esta política pode ser revista a qualquer momento. Alterações substanciais serão refletidas pela data de atualização no cabeçalho desta página.</p>
+    </section>
 
-    <h2 id="contato">10. Contato</h2>
-    <p><a href="mailto:lucascamy@hotmail.com">lucascamy@hotmail.com</a></p>
+    <section id="contato">
+      <h2>10. Canal de contato</h2>
+      <p>Para dúvidas, requisições de privacidade ou contato direto com o responsável, escreva para: <a href="mailto:lucascamy@hotmail.com">lucascamy@hotmail.com</a>.</p>
+    </section>
   </article>
 </div>
 
 <footer>
   <div class="wrap">
-    <a class="brand" href="index.html"><img src="img/avatar.webp" alt="" width="38" height="38">Uganda Knuckles</a>
+    <a class="brand" href="index.html">
+      <img class="brand-avatar" src="img/avatar.webp" alt="Uganda Knuckles" width="38" height="38">
+      <span>Uganda Knuckles</span>
+    </a>
     <nav aria-label="Rodapé">
       <a href="terms.html">Termos de Serviço</a>
       <a href="privacy.html">Política de Privacidade</a>
       <a href="mailto:lucascamy@hotmail.com">Contato</a>
       <a href="https://github.com/LucasCamy/CoreBot">GitHub</a>
     </nav>
-    <p class="disc">Projeto independente, sem afiliação ao Discord Inc.</p>
+    <p class="disc">Projeto independente, sem afiliação direta ao Discord Inc.</p>
   </div>
 </footer>
 
