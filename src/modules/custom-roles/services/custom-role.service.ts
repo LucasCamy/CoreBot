@@ -98,7 +98,10 @@ export class CustomRoleService {
       // 4. Verify bot permissions in guild
       const botMember = guild.members.me || (await guild.members.fetchMe().catch(() => null));
       if (!botMember || !botMember.permissions.has(PermissionFlagsBits.ManageRoles)) {
-        logger.error({ guildId: guild.id }, 'Bot lacks ManageRoles permission to create custom role');
+        logger.error(
+          { guildId: guild.id },
+          'Bot lacks ManageRoles permission to create custom role',
+        );
         return {
           success: false,
           error: 'O bot não possui a permissão de "Gerenciar Cargos" no servidor.',
@@ -186,7 +189,10 @@ export class CustomRoleService {
       const role = await guild.roles.fetch(existing.roleId).catch(() => null);
       if (role) {
         const colorInt = parseInt(color.replace('#', ''), 16) as ColorResolvable;
-        await role.setColor(colorInt, `CoreBot: Cor atualizada por ${member.user?.tag || member.id}`);
+        await role.setColor(
+          colorInt,
+          `CoreBot: Cor atualizada por ${member.user?.tag || member.id}`,
+        );
       }
 
       const updated = await repo.updateCustomRole(existing.id, { color });

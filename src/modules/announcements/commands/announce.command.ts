@@ -52,9 +52,7 @@ export const announceCommand: ICommand = {
             .setDescription('Conteúdo principal da mensagem/regras (use \\n para quebra de linha)')
             .setRequired(true),
         )
-        .addStringOption((opt) =>
-          opt.setName('titulo').setDescription('Título do anúncio/regras'),
-        )
+        .addStringOption((opt) => opt.setName('titulo').setDescription('Título do anúncio/regras'))
         .addStringOption((opt) =>
           opt.setName('cor').setDescription('Cor em hexadecimal (ex: #FF5733, #5865F2)'),
         )
@@ -135,7 +133,9 @@ export const announceCommand: ICommand = {
         .setCustomId('announce_content')
         .setLabel('Conteúdo / Regras da Mensagem')
         .setStyle(TextInputStyle.Paragraph)
-        .setPlaceholder('Digite aqui as regras ou comunicado. Suporta quebras de linha e formatação Discord.')
+        .setPlaceholder(
+          'Digite aqui as regras ou comunicado. Suporta quebras de linha e formatação Discord.',
+        )
         .setRequired(true)
         .setMaxLength(4000);
 

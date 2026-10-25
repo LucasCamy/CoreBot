@@ -50,10 +50,7 @@ export class AnnounceService {
       return { error: 'O canal especificado não foi encontrado.' };
     }
 
-    if (
-      channel.type !== ChannelType.GuildText &&
-      channel.type !== ChannelType.GuildAnnouncement
-    ) {
+    if (channel.type !== ChannelType.GuildText && channel.type !== ChannelType.GuildAnnouncement) {
       return { error: 'O canal selecionado deve ser um canal de texto ou avisos.' };
     }
 
@@ -89,7 +86,10 @@ export class AnnounceService {
     }
 
     if (content.length > 2000) {
-      return { success: false, error: 'O texto excede o limite máximo de 2000 caracteres do Discord.' };
+      return {
+        success: false,
+        error: 'O texto excede o limite máximo de 2000 caracteres do Discord.',
+      };
     }
 
     const { channel, error } = await this.getValidTextChannel(guild, channelId);
@@ -129,7 +129,10 @@ export class AnnounceService {
     }
 
     if (opts.description.length > 4096) {
-      return { success: false, error: 'A descrição excede o limite de 4096 caracteres do Discord.' };
+      return {
+        success: false,
+        error: 'A descrição excede o limite de 4096 caracteres do Discord.',
+      };
     }
 
     try {
@@ -241,7 +244,10 @@ export class AnnounceService {
       return { success: true, data: null };
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
-      logger.error({ error: msg, guildId: guild.id, channelId, messageId }, 'Failed to edit message');
+      logger.error(
+        { error: msg, guildId: guild.id, channelId, messageId },
+        'Failed to edit message',
+      );
       return { success: false, error: `Falha ao editar a mensagem: ${msg}` };
     }
   }

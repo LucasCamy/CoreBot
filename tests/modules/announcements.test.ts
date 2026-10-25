@@ -169,7 +169,9 @@ describe('Announcements Module', () => {
       });
 
       expect(res.success).toBe(false);
-      expect(res.error).toContain('Você só pode editar mensagens que foram enviadas pelo próprio bot');
+      expect(res.error).toContain(
+        'Você só pode editar mensagens que foram enviadas pelo próprio bot',
+      );
     });
   });
 });

@@ -25,7 +25,9 @@ export const announceModalHandler: IModalHandler = {
 
     if (!content) {
       await interaction.reply({
-        embeds: [BotEmbed.error('Conteúdo Obrigatório', 'Você deve preencher o texto da mensagem.')],
+        embeds: [
+          BotEmbed.error('Conteúdo Obrigatório', 'Você deve preencher o texto da mensagem.'),
+        ],
         ephemeral: true,
       });
       return;
