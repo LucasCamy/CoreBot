@@ -33,16 +33,17 @@ export class CustomRoleService {
     }
 
     // Server owner and Discord Administrators always have access
-    if (
+    const isOwnerOrAdmin =
       member.guild.ownerId === member.id ||
-      member.permissions.has(PermissionFlagsBits.Administrator)
-    ) {
+      member.permissions.has(PermissionFlagsBits.Administrator);
+
+    if (isOwnerOrAdmin) {
       return { allowed: true };
     }
 
     // If allowedRoleIds is configured, check if member holds any of the permitted roles
     if (config && config.allowedRoleIds.length > 0) {
-      const memberRoleIds = member.roles.cache.map((r) => r.id);
+      const memberRoleIds = member.roles.cache.map((r: Role) => r.id);
       const hasAllowedRole = config.allowedRoleIds.some((allowedId) =>
         memberRoleIds.includes(allowedId),
       );
@@ -67,43 +68,43 @@ export class CustomRoleService {
     rawName: string,
     rawColor: string,
   ): Promise<ServiceResult<UserCustomRole>> {
-    const guild = member.guild;
-    const repo = this.container.customRoleRepository;
-
-    // 1. Permission check
-    const permission = await this.canManageCustomRole(member);
-    if (!permission.allowed) {
-      return { success: false, error: permission.reason };
-    }
-
-    // 2. Validate maximum 1 custom role per user
-    const existing = await repo.findByUser(guild.id, member.id);
-    if (existing) {
-      return {
-        success: false,
-        error: `Você já possui um cargo personalizado (<@&${existing.roleId}>). Utilize \`/meucargo cor\` ou \`/meucargo nome\` para alterá-lo, ou \`/meucargo remover\` para excluí-lo.`,
-      };
-    }
-
-    // 3. Validate name and color with Zod
-    const validation = createCustomRoleSchema.safeParse({ name: rawName, color: rawColor });
-    if (!validation.success) {
-      return { success: false, error: validation.error.errors[0].message };
-    }
-
-    const { name, color } = validation.data;
-
-    // 4. Verify bot permissions in guild
-    const botMember = guild.members.me || (await guild.members.fetchMe().catch(() => null));
-    if (!botMember || !botMember.permissions.has(PermissionFlagsBits.ManageRoles)) {
-      logger.error({ guildId: guild.id }, 'Bot lacks ManageRoles permission to create custom role');
-      return {
-        success: false,
-        error: 'O bot não possui a permissão de "Gerenciar Cargos" no servidor.',
-      };
-    }
-
     try {
+      const guild = member.guild;
+      const repo = this.container.customRoleRepository;
+
+      // 1. Permission check
+      const permission = await this.canManageCustomRole(member);
+      if (!permission.allowed) {
+        return { success: false, error: permission.reason };
+      }
+
+      // 2. Validate maximum 1 custom role per user
+      const existing = await repo.findByUser(guild.id, member.id);
+      if (existing) {
+        return {
+          success: false,
+          error: `Você já possui um cargo personalizado (<@&${existing.roleId}>). Utilize \`/meucargo cor\` ou \`/meucargo nome\` para alterá-lo, ou \`/meucargo remover\` para excluí-lo.`,
+        };
+      }
+
+      // 3. Validate name and color with Zod
+      const validation = createCustomRoleSchema.safeParse({ name: rawName, color: rawColor });
+      if (!validation.success) {
+        return { success: false, error: validation.error.errors[0].message };
+      }
+
+      const { name, color } = validation.data;
+
+      // 4. Verify bot permissions in guild
+      const botMember = guild.members.me || (await guild.members.fetchMe().catch(() => null));
+      if (!botMember || !botMember.permissions.has(PermissionFlagsBits.ManageRoles)) {
+        logger.error({ guildId: guild.id }, 'Bot lacks ManageRoles permission to create custom role');
+        return {
+          success: false,
+          error: 'O bot não possui a permissão de "Gerenciar Cargos" no servidor.',
+        };
+      }
+
       const colorInt = parseInt(color.replace('#', ''), 16) as ColorResolvable;
 
       // 5. Create role in Discord with EXATAMENTE 0 permissions (permissions: 0n)
@@ -112,7 +113,7 @@ export class CustomRoleService {
         color: colorInt,
         permissions: 0n, // Strict requirement: zero permissions
         mentionable: false,
-        reason: `CoreBot: Cargo personalizado criado por ${member.user.tag} (${member.id})`,
+        reason: `CoreBot: Cargo personalizado criado por ${member.user?.tag || member.id} (${member.id})`,
       });
 
       // 6. Assign role to member
@@ -145,7 +146,7 @@ export class CustomRoleService {
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       logger.error(
-        { error: msg, guildId: guild.id, userId: member.id },
+        { error: msg, guildId: member.guild.id, userId: member.id },
         'Error during custom role creation',
       );
       return { success: false, error: `Falha ao criar o cargo no Discord: ${msg}` };
@@ -185,7 +186,7 @@ export class CustomRoleService {
       const role = await guild.roles.fetch(existing.roleId).catch(() => null);
       if (role) {
         const colorInt = parseInt(color.replace('#', ''), 16) as ColorResolvable;
-        await role.setColor(colorInt, `CoreBot: Cor atualizada por ${member.user.tag}`);
+        await role.setColor(colorInt, `CoreBot: Cor atualizada por ${member.user?.tag || member.id}`);
       }
 
       const updated = await repo.updateCustomRole(existing.id, { color });
@@ -236,7 +237,7 @@ export class CustomRoleService {
     try {
       const role = await guild.roles.fetch(existing.roleId).catch(() => null);
       if (role) {
-        await role.setName(name, `CoreBot: Nome atualizado por ${member.user.tag}`);
+        await role.setName(name, `CoreBot: Nome atualizado por ${member.user?.tag || member.id}`);
       }
 
       const updated = await repo.updateCustomRole(existing.id, { name });

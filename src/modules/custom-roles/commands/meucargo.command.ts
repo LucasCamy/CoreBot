@@ -125,10 +125,9 @@ export const meuCargoCommand: ICommand = {
 
     // 2. Subcomando: criar
     if (subcommand === 'criar') {
+      await interaction.deferReply({ ephemeral: true });
       const name = interaction.options.getString('nome', true);
       const color = interaction.options.getString('cor', true);
-
-      await interaction.deferReply({ ephemeral: true });
       const result = await service.createRole(member, name, color);
 
       if (!result.success || !result.data) {
@@ -153,9 +152,8 @@ export const meuCargoCommand: ICommand = {
 
     // 3. Subcomando: cor
     if (subcommand === 'cor') {
-      const color = interaction.options.getString('cor', true);
-
       await interaction.deferReply({ ephemeral: true });
+      const color = interaction.options.getString('cor', true);
       const result = await service.updateColor(member, color);
 
       if (!result.success || !result.data) {
@@ -178,9 +176,8 @@ export const meuCargoCommand: ICommand = {
 
     // 4. Subcomando: nome
     if (subcommand === 'nome') {
-      const newName = interaction.options.getString('novo_nome', true);
-
       await interaction.deferReply({ ephemeral: true });
+      const newName = interaction.options.getString('novo_nome', true);
       const result = await service.updateName(member, newName);
 
       if (!result.success || !result.data) {

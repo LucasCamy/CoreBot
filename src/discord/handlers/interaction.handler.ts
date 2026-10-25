@@ -18,16 +18,51 @@ export async function handleInteraction(
   client: CoreBotClient,
   interaction: Interaction,
 ): Promise<void> {
-  // Enforce security: strictly ignore any interactions outside allowed guilds
+  // Enforce security: reply and reject any interactions outside allowed guilds
   if (!interaction.guildId || !GuildGuard.isAllowed(interaction.guildId)) {
+    if (interaction.isRepliable()) {
+      await interaction
+        .reply({
+          embeds: [
+            BotEmbed.error(
+              'Servidor Não Autorizado',
+              'Este servidor não possui autorização para executar comandos deste bot.',
+            ),
+          ],
+          ephemeral: true,
+        })
+        .catch(() => null);
+    }
     return;
   }
 
   const container = client.container;
   const guild = interaction.guild;
-  const member = interaction.member as GuildMember;
+  let member = interaction.member as GuildMember;
 
-  if (!guild || !member) return;
+  if (guild && member && !(member instanceof GuildMember)) {
+    const fetchedMember = await guild.members.fetch(interaction.user.id).catch(() => null);
+    if (fetchedMember) {
+      member = fetchedMember;
+    }
+  }
+
+  if (!guild || !member) {
+    if (interaction.isRepliable()) {
+      await interaction
+        .reply({
+          embeds: [
+            BotEmbed.error(
+              'Erro de Contexto',
+              'Não foi possível identificar as informações do servidor ou do membro.',
+            ),
+          ],
+          ephemeral: true,
+        })
+        .catch(() => null);
+    }
+    return;
+  }
 
   // Track Prometheus event counter
   eventsProcessedCounter.inc({ event_type: interaction.type.toString() });
