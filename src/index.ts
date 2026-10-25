@@ -32,6 +32,7 @@ import { StreamNotifierModule } from './modules/stream-notifier/index.js';
 import { NotepadModule } from './modules/notepad/index.js';
 import { AnnouncementsModule } from './modules/announcements/index.js';
 import { SystemMessagesModule } from './modules/system-messages/index.js';
+import { ModerationModule } from './modules/moderation/index.js';
 
 async function bootstrap(): Promise<void> {
   logger.info('====================================================');
@@ -69,6 +70,7 @@ async function bootstrap(): Promise<void> {
   moduleRegistry.register(NotepadModule);
   moduleRegistry.register(AnnouncementsModule);
   moduleRegistry.register(SystemMessagesModule);
+  moduleRegistry.register(ModerationModule);
 
   // 4. Initialize Modules, Commands, Handlers & Schedulers
   await moduleRegistry.initAll();

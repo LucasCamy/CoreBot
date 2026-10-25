@@ -302,3 +302,14 @@ Substitui as mensagens padrão do Discord (de novos membros entrando e membros i
 - `{memberCount}` — Quantidade total de membros no servidor
 - `{boostCount}` — Quantidade total de impulsos (Server Boosts)
 - `{boostTier}` — Nível de impulso do servidor (0, 1, 2, 3)
+
+---
+
+## 18. Módulo: Moderação e Limpeza (`/limpar`)
+
+Comandos para limpar mensagens em massa ou recriar canais do zero (nuke), preservando automaticamente todas as permissões, cargos, tópicos e vínculos no banco de dados.
+
+| Comando             | Opções                                                                                 | Descrição                                                                                             | Permissão |
+| :------------------ | :------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------- | :-------- |
+| `/limpar mensagens` | `quantidade` _(1 a 100, obrigatório)_<br>`usuario`<br>`apenas_bots`<br>`apenas_anexos` | Apaga uma quantidade de mensagens recentes no canal atual com opção de filtros por usuário ou mídias. | Admin     |
+| `/limpar canal`     | `confirmar` _(obrigatório, True)_<br>`motivo`                                          | **Limpa 100% do canal** recriando-o do zero (apaga todo o histórico, inclusive msgs antigas).         | Admin     |
