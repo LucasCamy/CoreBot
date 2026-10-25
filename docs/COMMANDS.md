@@ -266,3 +266,39 @@ Estatísticas de permanência em call, despedidas bem-humoradas na madrugada e c
 
 - **Despedidas Noturnas:** Membros que saem de um canal de voz entre 01:00 e 06:00 recebem uma despedida aleatória e divertida no chat (ex: _"{user} arriou os pneus e foi nanar 😴"_).
 - **Aviso Diário:** Todo dia às 09:00 o bot atualiza o canal com os dias restantes para cada evento.
+
+---
+
+## 16. Módulo: Anúncios e Mensagens (`/anunciar`)
+
+Permite que a equipe administrativa envie mensagens e comunicados pelo bot (regras, avisos, novidades) em formato texto simples ou Embed estilizado, além de editar comunicados já enviados.
+
+| Comando              | Opções                                                                                                                     | Descrição                                                                      | Permissão |
+| :------------------- | :------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------- | :-------- |
+| `/anunciar mensagem` | `canal` _(obrigatório)_<br>`conteudo` _(obrigatório)_                                                                      | Envia uma mensagem em texto simples no canal escolhido.                        | Admin     |
+| `/anunciar embed`    | `canal` _(obrigatório)_<br>`titulo`<br>`descricao` _(obrigatório)_<br>`cor`<br>`imagem_url`<br>`miniatura_url`<br>`rodape` | Envia um Embed formatado com cores, imagem, miniatura e rodapé.                | Admin     |
+| `/anunciar modal`    | `canal` _(obrigatório)_                                                                                                    | Abre uma janela interativa (Modal) com campos de texto longos para formatação. | Admin     |
+| `/anunciar editar`   | `canal` _(obrigatório)_<br>`id_mensagem` _(obrigatório)_<br>`novo_conteudo`                                                | Edita uma mensagem ou Embed enviado anteriormente pelo próprio bot.            | Admin     |
+
+---
+
+## 17. Módulo: Mensagens do Sistema (`/mensagens-sistema`)
+
+Substitui as mensagens padrão do Discord (de novos membros entrando e membros impulsionando o servidor) por mensagens customizadas do bot com suporte a embeds, menções e tags dinâmicas.
+
+| Comando                          | Opções                                                    | Descrição                                                                         | Permissão |
+| :------------------------------- | :-------------------------------------------------------- | :-------------------------------------------------------------------------------- | :-------- |
+| `/mensagens-sistema boas-vindas` | `canal`<br>`ativo`<br>`mensagem`<br>`usar_embed`<br>`cor` | Configura a mensagem de boas-vindas para novos membros que entram no servidor.    | Admin     |
+| `/mensagens-sistema boost`       | `canal`<br>`ativo`<br>`mensagem`<br>`usar_embed`<br>`cor` | Configura a mensagem disparada quando alguém dá Server Boost no servidor.         | Admin     |
+| `/mensagens-sistema painel`      | _Nenhuma_                                                 | Exibe o status atual, canais configurados, modelos de mensagem e tags dinâmicas.  | Admin     |
+| `/mensagens-sistema testar`      | `tipo` (`boas-vindas` ou `boost`)                         | Dispara uma simulação imediata no canal configurado para validar layout e textos. | Admin     |
+
+### Tags Dinâmicas Suportadas:
+
+- `{user}` — Nome de exibição do membro
+- `{userMention}` — Menção direta ao membro (`@membro`)
+- `{username}` — Username do membro
+- `{server}` — Nome do servidor
+- `{memberCount}` — Quantidade total de membros no servidor
+- `{boostCount}` — Quantidade total de impulsos (Server Boosts)
+- `{boostTier}` — Nível de impulso do servidor (0, 1, 2, 3)

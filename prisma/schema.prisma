@@ -37,6 +37,7 @@ model GuildConfig {
   countdowns          Countdown[]
   streamers           StreamerConfig[]
   notepadLists        NotepadList[]
+  systemMessageConfig SystemMessageConfig?
 
   @@map("guild_configs")
 }
@@ -471,6 +472,29 @@ model StreamerConfig {
   @@index([guildId])
   @@index([streamerLogin])
   @@map("streamer_configs")
+}
+
+model SystemMessageConfig {
+  id               String      @id @default(uuid())
+  guildId          String      @unique
+  welcomeEnabled   Boolean     @default(true)
+  welcomeChannelId String?
+  welcomeMessage   String      @default("👋 Seja bem-vindo(a) ao **{server}**, {userMention}! Agora somos **{memberCount}** membros.")
+  welcomeUseEmbed  Boolean     @default(true)
+  welcomeColor     String?     @default("#5865F2")
+
+  boostEnabled     Boolean     @default(true)
+  boostChannelId   String?
+  boostMessage     String      @default("🚀 **{userMention}** acabou de impulsionar o servidor! Muito obrigado pelo apoio! O **{server}** agora conta com **{boostCount}** impulsos. 🎉")
+  boostUseEmbed    Boolean     @default(true)
+  boostColor       String?     @default("#F47FFF")
+
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  guild            GuildConfig @relation(fields: [guildId], references: [guildId], onDelete: Cascade)
+
+  @@map("system_message_configs")
 }
 
 

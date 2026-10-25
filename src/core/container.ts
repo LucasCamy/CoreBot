@@ -18,6 +18,7 @@ import { TribunalRepository } from '../database/repositories/tribunal.repository
 import { SocialAnalyticsRepository } from '../database/repositories/social-analytics.repository.js';
 import { StreamerRepository } from '../database/repositories/streamer.repository.js';
 import { NotepadRepository } from '../database/repositories/notepad.repository.js';
+import { SystemMessagesRepository } from '../database/repositories/system-messages.repository.js';
 import { MessageTemplateService } from '../services/template.service.js';
 import { NotificationService } from '../services/notification.service.js';
 import { CoreBotClient } from '../discord/client.js';
@@ -53,6 +54,7 @@ export class Container {
   public readonly socialAnalyticsRepository: SocialAnalyticsRepository;
   public readonly streamerRepository: StreamerRepository;
   public readonly notepadRepository: NotepadRepository;
+  public readonly systemMessagesRepository: SystemMessagesRepository;
   public readonly templateService: MessageTemplateService;
   public readonly notificationService: NotificationService;
   public readonly presenceService: PresenceService;
@@ -93,6 +95,7 @@ export class Container {
     this.socialAnalyticsRepository = new SocialAnalyticsRepository(this.prisma);
     this.streamerRepository = new StreamerRepository(this.prisma);
     this.notepadRepository = new NotepadRepository(this.prisma);
+    this.systemMessagesRepository = new SystemMessagesRepository(this.prisma);
 
     // Services
     this.templateService = new MessageTemplateService();

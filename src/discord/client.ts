@@ -22,6 +22,7 @@ export class CoreBotClient extends Client {
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildVoiceStates,
         GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildMembers,
       ],
       partials: [Partials.Channel, Partials.Message, Partials.GuildMember, Partials.User],
     });
